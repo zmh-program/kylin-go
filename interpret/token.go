@@ -11,7 +11,8 @@ const (
 	EOF TokenType = iota
 	Space
 	Enter
-	Number
+	Integer
+	Float
 	Identifier
 	Addition
 	Subtraction

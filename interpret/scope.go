@@ -21,3 +21,33 @@ func (s *Scope) Get(name string) interface{} {
 	}
 	return nil
 }
+
+func (s *Scope) Set(name string, value interface{}) {
+	s.variables[name] = value
+}
+
+func (s *Scope) Has(name string) bool {
+	if _, ok := s.variables[name]; ok {
+		return true
+	}
+	if s.parent != nil {
+		return s.parent.Has(name)
+	}
+	return false
+}
+
+func (s *Scope) Delete(name string) {
+	delete(s.variables, name)
+}
+
+func (s *Scope) Clear() {
+	s.variables = make(map[string]interface{})
+}
+
+func (s *Scope) Copy() *Scope {
+	scope := NewScope(nil)
+	for k, v := range s.variables {
+		scope.Set(k, v)
+	}
+	return scope
+}

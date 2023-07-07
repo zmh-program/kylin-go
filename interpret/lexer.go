@@ -98,7 +98,12 @@ func (l *Lexer) Next() Token {
 		return Token{Type: Space, Value: "\t"}
 	default:
 		if utils.IsDigit(value) {
-			return Token{Type: Number, Value: l.readNumber()}
+			value, decimal := l.readNumber()
+			if decimal {
+				return Token{Type: Float, Value: value}
+			} else {
+				return Token{Type: Integer, Value: value}
+			}
 		}
 		if utils.IsLetter(value) {
 			return Token{Type: Identifier, Value: l.readIdentifier()}
@@ -107,18 +112,24 @@ func (l *Lexer) Next() Token {
 	return Token{Type: EOF, Value: ""}
 }
 
-func (l *Lexer) readNumber() string {
+func (l *Lexer) readNumber() (string, bool) {
 	var number string
+	decimal := false
 	for l.cursor < len(l.data) {
 		value := l.data[l.cursor]
-		if value >= '0' && value <= '9' {
+		if utils.IsDigit(value) {
 			number += string(value)
 			l.cursor++
-		} else {
-			break
+			continue
+		}
+		if value == '.' && !decimal && utils.IsDigit(l.data[l.cursor+1]) {
+			decimal = true
+			number += string(value)
+			l.cursor++
+			continue
 		}
 	}
-	return number
+	return number, decimal
 }
 
 func (l *Lexer) readIdentifier() string {

@@ -1,5 +1,7 @@
 package interpret
 
+import "fmt"
+
 type Scope struct {
 	parent    *Scope
 	variables map[string]interface{}
@@ -19,7 +21,7 @@ func (s *Scope) Get(name string) interface{} {
 	if s.parent != nil {
 		return s.parent.Get(name)
 	}
-	return nil
+	panic(fmt.Sprintf("Variable '%s' not found", name))
 }
 
 func (s *Scope) Set(name string, value interface{}) {

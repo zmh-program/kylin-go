@@ -15,3 +15,10 @@ func IsRegularSymbol(n byte) bool {
 func IsRegular(n byte) bool {
 	return IsLetter(n) || IsRegularSymbol(n) || IsDigit(n)
 }
+
+func MustGet[T comparable](data T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return data
+}

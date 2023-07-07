@@ -1,6 +1,9 @@
 package interpret
 
-import "kylin/utils"
+import (
+	"kylin/utils"
+	"strconv"
+)
 
 type Interpreter struct {
 	lexer *Lexer
@@ -24,10 +27,13 @@ func (i *Interpreter) SetVariable(name string, value interface{}) {
 }
 
 func (i *Interpreter) Expr(token *Token) interface{} {
-	if token.Type == Number {
-		return token.Value
+	switch token.Type {
+	case Integer:
+		return utils.MustGet(strconv.Atoi(token.Value))
+	case Float:
+		return utils.MustGet(strconv.ParseFloat(token.Value, 64))
+	case Identifier:
+		return i.scope.Get(token.Value)
 	}
-	if token.Type == Identifier {
-		return i.GetVariable(token.Value)
-	}
+	panic("Invalid syntax")
 }

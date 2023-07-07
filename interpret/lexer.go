@@ -75,8 +75,16 @@ func (l *Lexer) Next() Token {
 	case ';':
 		return Token{Type: Semicolon, Value: ";"}
 	case '=':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: IsEquals, Value: "=="}
+		}
 		return Token{Type: Equals, Value: "="}
 	case '!':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: NotEquals, Value: "!="}
+		}
 		return Token{Type: Not, Value: "!"}
 	case '&':
 		return Token{Type: And, Value: "&"}

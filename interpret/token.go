@@ -30,8 +30,6 @@ const (
 	Colon
 	Semicolon
 	Equals
-	NotEquals
-	Assignment
 	PlusEquals
 	MinusEquals
 	TimesEquals
@@ -41,4 +39,6 @@ const (
 	And
 	Or
 	Not
+	IsEquals
+	NotEquals
 )

@@ -19,17 +19,69 @@ func (l *Lexer) Next() Token {
 	l.cursor++
 	switch value {
 	case '+':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: PlusEquals, Value: "+="}
+		}
 		return Token{Type: Addition, Value: "+"}
 	case '-':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: MinusEquals, Value: "-="}
+		}
 		return Token{Type: Subtraction, Value: "-"}
 	case '*':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: TimesEquals, Value: "*="}
+		}
 		return Token{Type: Multiplication, Value: "*"}
 	case '/':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: DividedEquals, Value: "/="}
+		}
 		return Token{Type: Division, Value: "/"}
+	case '%':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: ModuloEquals, Value: "%="}
+		}
+		return Token{Type: Modulo, Value: "%"}
+	case '^':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.cursor++
+			return Token{Type: ExponentEquals, Value: "^="}
+		}
+		return Token{Type: Exponent, Value: "^"}
 	case '(':
 		return Token{Type: LeftParenthesis, Value: "("}
 	case ')':
 		return Token{Type: RightParenthesis, Value: ")"}
+	case '[':
+		return Token{Type: LeftBracket, Value: "["}
+	case ']':
+		return Token{Type: RightBracket, Value: "]"}
+	case '{':
+		return Token{Type: LeftBrace, Value: "{"}
+	case '}':
+		return Token{Type: RightBrace, Value: "}"}
+	case ',':
+		return Token{Type: Comma, Value: ","}
+	case '.':
+		return Token{Type: Period, Value: "."}
+	case ':':
+		return Token{Type: Colon, Value: ":"}
+	case ';':
+		return Token{Type: Semicolon, Value: ";"}
+	case '=':
+		return Token{Type: Equals, Value: "="}
+	case '!':
+		return Token{Type: Not, Value: "!"}
+	case '&':
+		return Token{Type: And, Value: "&"}
+	case '|':
+		return Token{Type: Or, Value: "|"}
 	case ' ':
 		return Token{Type: Space, Value: " "}
 	case '\n':
@@ -44,6 +96,7 @@ func (l *Lexer) Next() Token {
 			return Token{Type: Identifier, Value: l.readIdentifier()}
 		}
 	}
+	return Token{Type: EOF, Value: ""}
 }
 
 func (l *Lexer) readNumber() string {

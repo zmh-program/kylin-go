@@ -28,6 +28,30 @@ func (i *Interpreter) SetVariable(name string, value interface{}) {
 	i.scope.Set(name, value)
 }
 
+func (i *Interpreter) GetScope() *Scope {
+	return i.scope
+}
+
+func (i *Interpreter) SetScope(scope *Scope) {
+	i.scope = scope
+}
+
+func (i *Interpreter) Next() Token {
+	return i.lexer.Next()
+}
+
+func (i *Interpreter) Peek() Token {
+	return i.lexer.Peek()
+}
+
+func (i *Interpreter) Skip() {
+	i.lexer.Skip()
+}
+
+func (i *Interpreter) GetNextPtr() *Token {
+	return i.lexer.GetNextPtr()
+}
+
 func (i *Interpreter) Expr(token *Token) interface{} {
 	switch token.Type {
 	case Integer:
@@ -37,9 +61,9 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 	case String:
 		return token.Value
 	case Identifier:
-		if !i.IsEnd() && i.lexer.Peek().Type == Equals {
-			i.lexer.Skip()
-			i.SetVariable(token.Value, i.Expr(i.lexer.GetNextPtr()))
+		if !i.IsEnd() && i.Peek().Type == Equals {
+			i.Skip()
+			i.SetVariable(token.Value, i.Expr(i.GetNextPtr()))
 			return nil
 		} else {
 			return i.GetVariable(token.Value)
@@ -47,18 +71,17 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 	case LeftParenthesis:
 		return i.Expr(i.lexer.GetNextPtr())
 	case Addition:
-		fmt.Println(i.GetBuffer(), "hi")
-		return i.GetBuffer().(float64) + i.Expr(i.lexer.GetNextPtr()).(float64)
+		return i.GetBuffer().(float64) + i.Expr(i.GetNextPtr()).(float64)
 	case Subtraction:
-		return i.GetBuffer().(float64) - i.Expr(i.lexer.GetNextPtr()).(float64)
+		return i.GetBuffer().(float64) - i.Expr(i.GetNextPtr()).(float64)
 	case Multiplication:
-		return i.GetBuffer().(float64) * i.Expr(i.lexer.GetNextPtr()).(float64)
+		return i.GetBuffer().(float64) * i.Expr(i.GetNextPtr()).(float64)
 	case Division:
-		return i.GetBuffer().(float64) / i.Expr(i.lexer.GetNextPtr()).(float64)
+		return i.GetBuffer().(float64) / i.Expr(i.GetNextPtr()).(float64)
 	case Modulo:
-		return int(i.GetBuffer().(float64)) % int(i.Expr(i.lexer.GetNextPtr()).(float64))
+		return int(i.GetBuffer().(float64)) % int(i.Expr(i.GetNextPtr()).(float64))
 	case Exponent:
-		return utils.Pow(i.GetBuffer().(float64), i.Expr(i.lexer.GetNextPtr()).(float64))
+		return utils.Pow(i.GetBuffer().(float64), i.Expr(i.GetNextPtr()).(float64))
 	case PlusEquals:
 		i.GetBuffer()
 	}
@@ -89,12 +112,14 @@ func (i *Interpreter) IsEnd() bool {
 	return i.lexer.IsEnd()
 }
 
+func (i *Interpreter) ExprNext() interface{} {
+	res := i.Expr(i.GetNextPtr())
+	i.SetBuffer(res)
+	return res
+}
+
 func (i *Interpreter) Run() {
-	for {
-		i.SetBuffer(i.Expr(i.lexer.GetNextPtr()))
-		fmt.Println(i.GetBuffer())
-		if i.IsEnd() {
-			break
-		}
+	for !i.IsEnd() {
+		fmt.Println(i.ExprNext())
 	}
 }

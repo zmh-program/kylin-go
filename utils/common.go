@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"fmt"
+	"log"
+)
+
 func IsLetter(n byte) bool {
 	return (n >= 'a' && n <= 'z') || (n >= 'A' && n <= 'Z')
 }
@@ -18,7 +23,7 @@ func IsRegular(n byte) bool {
 
 func MustGet[T comparable](data T, err error) T {
 	if err != nil {
-		panic(err)
+		log.Fatalln(fmt.Sprintf("Error: %s", err))
 	}
 	return data
 }

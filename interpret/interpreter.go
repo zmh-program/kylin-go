@@ -1,6 +1,7 @@
 package interpret
 
 import (
+	"fmt"
 	"kylin/utils"
 	"strconv"
 )
@@ -32,8 +33,25 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return utils.MustGet(strconv.Atoi(token.Value))
 	case Float:
 		return utils.MustGet(strconv.ParseFloat(token.Value, 64))
+	case String:
+		return token.Value
 	case Identifier:
 		return i.scope.Get(token.Value)
 	}
-	panic("Invalid syntax")
+	return token.Value
+}
+
+func (i *Interpreter) IsEnd() bool {
+	return i.lexer.IsEnd()
+}
+
+func (i *Interpreter) Run() {
+	for {
+		token := i.lexer.Next()
+		fmt.Println(i.Expr(&token))
+
+		if i.IsEnd() {
+			break
+		}
+	}
 }

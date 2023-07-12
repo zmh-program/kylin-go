@@ -1,6 +1,8 @@
 package interpret
 
-import "kylin/utils"
+import (
+	"kylin/utils"
+)
 
 type Lexer struct {
 	data   string
@@ -98,7 +100,7 @@ func (l *Lexer) Next() Token {
 		return Token{Type: Space, Value: "\t"}
 	default:
 		if utils.IsDigit(value) {
-			value, decimal := l.readNumber()
+			value, decimal := l.readNumber(string(value))
 			if decimal {
 				return Token{Type: Float, Value: value}
 			} else {
@@ -106,14 +108,28 @@ func (l *Lexer) Next() Token {
 			}
 		}
 		if utils.IsLetter(value) {
-			return Token{Type: Identifier, Value: l.readIdentifier()}
+			return Token{Type: Identifier, Value: l.readIdentifier(string(value))}
 		}
 	}
 	return Token{Type: EOF, Value: ""}
 }
 
-func (l *Lexer) readNumber() (string, bool) {
-	var number string
+func (l *Lexer) Peek() Token {
+	cursor := l.cursor
+	token := l.Next()
+	l.cursor = cursor
+	return token
+}
+
+func (l *Lexer) Skip() {
+	l.cursor++
+}
+
+func (l *Lexer) IsEnd() bool {
+	return l.cursor >= len(l.data)
+}
+
+func (l *Lexer) readNumber(number string) (string, bool) {
 	decimal := false
 	for l.cursor < len(l.data) {
 		value := l.data[l.cursor]
@@ -128,12 +144,12 @@ func (l *Lexer) readNumber() (string, bool) {
 			l.cursor++
 			continue
 		}
+		break
 	}
 	return number, decimal
 }
 
-func (l *Lexer) readIdentifier() string {
-	var identifier string
+func (l *Lexer) readIdentifier(identifier string) string {
 	var size int
 	for l.cursor < len(l.data) {
 		size++

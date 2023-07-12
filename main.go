@@ -1,16 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"kylin/interpret"
 	"os"
 )
 
 func main() {
+	var file string
 	if len(os.Args) < 2 {
-		fmt.Println("Please specify a file to run.")
-		return
+		file = "main.ky"
+	} else {
+		file = os.Args[1]
 	}
-	runtime := interpret.NewInterpreter(os.Args[1], nil)
+
+	runtime := interpret.NewInterpreter(file, nil)
 	runtime.Run()
 }

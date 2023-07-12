@@ -93,11 +93,11 @@ func (l *Lexer) Next() Token {
 	case '|':
 		return Token{Type: Or, Value: "|"}
 	case ' ':
-		return Token{Type: Space, Value: " "}
+		return l.Next()
 	case '\n':
 		return Token{Type: Enter, Value: "\n"}
 	case '\t':
-		return Token{Type: Space, Value: "\t"}
+		return l.Next()
 	default:
 		if utils.IsDigit(value) {
 			value, decimal := l.readNumber(string(value))
@@ -110,6 +110,9 @@ func (l *Lexer) Next() Token {
 		if utils.IsLetter(value) {
 			return Token{Type: Identifier, Value: l.readIdentifier(string(value))}
 		}
+		if utils.IsString(value) {
+			return Token{Type: String, Value: l.readString()}
+		}
 	}
 	return Token{Type: EOF, Value: ""}
 }
@@ -121,8 +124,20 @@ func (l *Lexer) Peek() Token {
 	return token
 }
 
+func (l *Lexer) PeekNext() Token {
+	l.cursor++
+	token := l.Next()
+	l.cursor--
+	return token
+}
+
 func (l *Lexer) Skip() {
 	l.cursor++
+}
+
+func (l *Lexer) GetNextPtr() *Token {
+	token := l.Next()
+	return &token
 }
 
 func (l *Lexer) IsEnd() bool {
@@ -165,4 +180,18 @@ func (l *Lexer) readIdentifier(identifier string) string {
 		}
 	}
 	return identifier
+}
+
+func (l *Lexer) readString() string {
+	var str string
+	for l.cursor < len(l.data) {
+		value := l.data[l.cursor]
+		if utils.IsString(value) {
+			l.cursor++
+			break
+		}
+		str += string(value)
+		l.cursor++
+	}
+	return str
 }

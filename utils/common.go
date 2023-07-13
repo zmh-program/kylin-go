@@ -31,3 +31,7 @@ func MustGet[T comparable](data T, err error) T {
 	}
 	return data
 }
+
+func ToString[T any](data T) string {
+	return fmt.Sprintf("%v", data)
+}

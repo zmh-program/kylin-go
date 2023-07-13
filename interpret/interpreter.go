@@ -1,6 +1,7 @@
 package interpret
 
 import (
+	"fmt"
 	"kylin/include"
 	"kylin/module"
 	"kylin/utils"
@@ -61,6 +62,38 @@ func (i *Interpreter) GetCurrentColumn() int {
 
 func (i *Interpreter) GetNextPtr() *Token {
 	return i.lexer.GetNextPtr()
+}
+
+func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
+	if token.Type != Identifier {
+		return false, nil
+	}
+
+	if i.IsEnd() {
+		return false, nil
+	}
+
+	if i.Peek().Type != LeftParenthesis {
+		return false, nil
+	}
+	i.Skip()
+
+	use := make([]interface{}, 0)
+	for {
+		if i.IsEnd() {
+			return false, nil
+		}
+		if i.Peek().Type == RightParenthesis {
+			i.Skip()
+			break
+		}
+		use = append(use, i.ExprNext())
+		if i.Peek().Type == Comma {
+			i.Skip()
+		}
+	}
+	resp := i.GetVariable(token.Value).(func(...interface{}) interface{})(use...)
+	return true, resp
 }
 
 func (i *Interpreter) AssignCall(token *Token) bool {
@@ -145,6 +178,17 @@ func (i *Interpreter) CountCall(token *Token) interface{} {
 	}
 }
 
+func (i *Interpreter) ParenthesisCall() interface{} {
+	i.Skip()
+	r := i.ExprNext()
+	if i.Peek().Type != RightParenthesis {
+		panic("Parenthesis not closed")
+	}
+	i.Skip()
+	fmt.Println(r)
+	return r
+}
+
 func (i *Interpreter) Expr(token *Token) interface{} {
 	switch token.Type {
 	case Integer:
@@ -154,10 +198,13 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 	case String:
 		return token.Value
 	case Identifier:
-		if !i.AssignCall(token) {
-			return i.CountCall(token)
+		if i.AssignCall(token) {
+			return nil
 		}
-		return nil
+		if check, resp := i.FunctionCall(token); check {
+			return resp
+		}
+		return i.CountCall(token)
 	case LeftParenthesis:
 		return i.ExprNext()
 	case RightParenthesis:

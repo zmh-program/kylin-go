@@ -1,9 +1,11 @@
 package include
 
 import (
-	"fmt"
+	"kylin/utils"
 	"strings"
 )
+
+type KyFunc func(...interface{})
 
 func NewGlobalScope() *Scope {
 	scope := NewScope(nil)
@@ -24,11 +26,17 @@ func NewGlobalScope() *Scope {
 	return scope
 }
 
-func Print(obj ...interface{}) {
-	fmt.Println(obj)
+func Print(obj ...interface{}) interface{} {
+	var str []string
+	for _, v := range obj {
+		str = append(str, utils.ToString(v))
+	}
+	println(strings.Join(str, " "))
+
+	return nil
 }
 
-func Sum(args ...interface{}) float64 {
+func Sum(args ...interface{}) interface{} {
 	var sum float64
 	for _, v := range args {
 		switch v.(type) {
@@ -41,7 +49,7 @@ func Sum(args ...interface{}) float64 {
 	return sum
 }
 
-func Max(args ...interface{}) float64 {
+func Max(args ...interface{}) interface{} {
 	var max float64
 	for _, v := range args {
 		switch v.(type) {
@@ -58,8 +66,8 @@ func Max(args ...interface{}) float64 {
 	return max
 }
 
-func Min(args ...interface{}) float64 {
-	var min float64
+func Min(args ...interface{}) interface{} {
+	min := args[0].(float64)
 	for _, v := range args {
 		switch v.(type) {
 		case int:
@@ -104,7 +112,7 @@ func Type(obj interface{}) string {
 	}
 }
 
-func Abs(num float64) float64 {
+func Abs(num float64) interface{} {
 	if num < 0 {
 		return -num
 	}

@@ -15,46 +15,51 @@ func NewLexer(data string) *Lexer {
 	return &Lexer{data: data, cursor: 0, line: 0, column: 0}
 }
 
+func (l *Lexer) NextCursor() {
+	l.cursor++
+	l.column++
+}
+
 func (l *Lexer) Next() Token {
 	if l.cursor >= len(l.data) {
 		return Token{Type: EOF, Value: ""}
 	}
 	value := l.data[l.cursor]
-	l.cursor++
+	l.NextCursor()
 	switch value {
 	case '+':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: PlusEquals, Value: "+="}
 		}
 		return Token{Type: Addition, Value: "+"}
 	case '-':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: MinusEquals, Value: "-="}
 		}
 		return Token{Type: Subtraction, Value: "-"}
 	case '*':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: TimesEquals, Value: "*="}
 		}
 		return Token{Type: Multiplication, Value: "*"}
 	case '/':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: DividedEquals, Value: "/="}
 		}
 		return Token{Type: Division, Value: "/"}
 	case '%':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: ModuloEquals, Value: "%="}
 		}
 		return Token{Type: Modulo, Value: "%"}
 	case '^':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: ExponentEquals, Value: "^="}
 		}
 		return Token{Type: Exponent, Value: "^"}
@@ -80,13 +85,13 @@ func (l *Lexer) Next() Token {
 		return Token{Type: Semicolon, Value: ";"}
 	case '=':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: IsEquals, Value: "=="}
 		}
 		return Token{Type: Equals, Value: "="}
 	case '!':
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.cursor++
+			l.NextCursor()
 			return Token{Type: NotEquals, Value: "!="}
 		}
 		return Token{Type: Not, Value: "!"}
@@ -98,6 +103,7 @@ func (l *Lexer) Next() Token {
 		return l.Next()
 	case '\n':
 		l.line++
+		l.column = 0
 		return Token{Type: Enter, Value: "\n"}
 	case '\t':
 		return l.Next()
@@ -128,14 +134,14 @@ func (l *Lexer) Peek() Token {
 }
 
 func (l *Lexer) PeekNext() Token {
-	l.cursor++
+	l.NextCursor()
 	token := l.Next()
 	l.cursor--
 	return token
 }
 
 func (l *Lexer) Skip() {
-	l.cursor++
+	l.NextCursor()
 }
 
 func (l *Lexer) GetNextPtr() *Token {
@@ -153,13 +159,13 @@ func (l *Lexer) readNumber(number string) (string, bool) {
 		value := l.data[l.cursor]
 		if utils.IsDigit(value) {
 			number += string(value)
-			l.cursor++
+			l.NextCursor()
 			continue
 		}
 		if value == '.' && !decimal && utils.IsDigit(l.data[l.cursor+1]) {
 			decimal = true
 			number += string(value)
-			l.cursor++
+			l.NextCursor()
 			continue
 		}
 		break
@@ -177,7 +183,7 @@ func (l *Lexer) readIdentifier(identifier string) string {
 		}
 		if utils.IsRegular(value) {
 			identifier += string(value)
-			l.cursor++
+			l.NextCursor()
 		} else {
 			break
 		}
@@ -190,11 +196,11 @@ func (l *Lexer) readString() string {
 	for l.cursor < len(l.data) {
 		value := l.data[l.cursor]
 		if utils.IsString(value) {
-			l.cursor++
+			l.NextCursor()
 			break
 		}
 		str += string(value)
-		l.cursor++
+		l.NextCursor()
 	}
 	return str
 }

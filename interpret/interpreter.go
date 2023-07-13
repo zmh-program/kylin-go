@@ -1,7 +1,6 @@
 package interpret
 
 import (
-	"fmt"
 	"kylin/include"
 	"kylin/module"
 	"kylin/utils"
@@ -78,7 +77,7 @@ func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
 	}
 	i.Skip()
 
-	use := make([]interface{}, 0)
+	param := make([]interface{}, 0)
 	for {
 		if i.IsEnd() {
 			return false, nil
@@ -87,12 +86,13 @@ func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
 			i.Skip()
 			break
 		}
-		use = append(use, i.ExprNext())
+		param = append(param, i.ExprNext())
 		if i.Peek().Type == Comma {
 			i.Skip()
 		}
 	}
-	resp := i.GetVariable(token.Value).(func(...interface{}) interface{})(use...)
+
+	resp := utils.CallFunc(i.GetVariable(token.Value), param)
 	return true, resp
 }
 
@@ -185,8 +185,25 @@ func (i *Interpreter) ParenthesisCall() interface{} {
 		panic("Parenthesis not closed")
 	}
 	i.Skip()
-	fmt.Println(r)
 	return r
+}
+
+func (i *Interpreter) ReadArray() []interface{} {
+	array := make([]interface{}, 0)
+	for {
+		if i.IsEnd() {
+			panic("Array not closed")
+		}
+		if i.Peek().Type == RightBracket {
+			i.Skip()
+			break
+		}
+		array = append(array, i.ExprNext())
+		if i.Peek().Type == Comma {
+			i.Skip()
+		}
+	}
+	return array
 }
 
 func (i *Interpreter) Expr(token *Token) interface{} {
@@ -205,10 +222,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 			return resp
 		}
 		return i.CountCall(token)
-	case LeftParenthesis:
-		return i.ExprNext()
-	case RightParenthesis:
-		return i.ExprNext()
+	case LeftBracket:
+		return i.ReadArray()
 	case Addition:
 		return i.GetBuffer().(float64) + i.ExprNext().(float64)
 	case Subtraction:

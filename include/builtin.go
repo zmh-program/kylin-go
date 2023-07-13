@@ -50,6 +50,10 @@ func Sum(args ...interface{}) interface{} {
 }
 
 func Max(args ...interface{}) interface{} {
+	if len(args) == 1 && utils.IsTypeArray(args[0]) {
+		return Max(args[0].([]interface{})...)
+	}
+
 	var max float64
 	for _, v := range args {
 		switch v.(type) {
@@ -67,6 +71,10 @@ func Max(args ...interface{}) interface{} {
 }
 
 func Min(args ...interface{}) interface{} {
+	if len(args) == 1 && utils.IsTypeArray(args[0]) {
+		return Min(args[0].([]interface{})...)
+	}
+
 	min := args[0].(float64)
 	for _, v := range args {
 		switch v.(type) {
@@ -83,7 +91,7 @@ func Min(args ...interface{}) interface{} {
 	return min
 }
 
-func Len(obj interface{}) int {
+func Len(obj interface{}) interface{} {
 	switch obj.(type) {
 	case string:
 		return len(obj.(string))
@@ -93,7 +101,7 @@ func Len(obj interface{}) int {
 	return 0
 }
 
-func Type(obj interface{}) string {
+func Type(obj interface{}) interface{} {
 	switch obj.(type) {
 	case int:
 		return "int"
@@ -119,7 +127,7 @@ func Abs(num float64) interface{} {
 	return num
 }
 
-func All(args ...interface{}) bool {
+func All(args ...interface{}) interface{} {
 	for _, v := range args {
 		if !v.(bool) {
 			return false
@@ -128,7 +136,7 @@ func All(args ...interface{}) bool {
 	return true
 }
 
-func Any(args ...interface{}) bool {
+func Any(args ...interface{}) interface{} {
 	for _, v := range args {
 		if v.(bool) {
 			return true
@@ -137,6 +145,6 @@ func Any(args ...interface{}) bool {
 	return false
 }
 
-func Split(str string, sep string) []string {
+func Split(str string, sep string) interface{} {
 	return strings.Split(str, sep)
 }

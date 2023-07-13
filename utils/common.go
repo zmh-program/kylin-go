@@ -25,6 +25,10 @@ func IsString(n byte) bool {
 	return n == '"' || n == '\''
 }
 
+func IsArray(n byte) bool {
+	return n == '[' || n == ']'
+}
+
 func MustGet[T comparable](data T, err error) T {
 	if err != nil {
 		log.Fatalln(fmt.Sprintf("Error: %s", err))

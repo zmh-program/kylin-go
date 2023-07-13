@@ -14,6 +14,8 @@ const (
 	Integer
 	Float
 	String
+	True
+	False
 	Identifier
 	Addition
 	Subtraction

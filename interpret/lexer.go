@@ -45,6 +45,13 @@ func (l *Lexer) Next() Token {
 		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
 			l.NextCursor()
 			return Token{Type: TimesEquals, Value: "*="}
+		} else if l.cursor < len(l.data) && l.data[l.cursor] == '*' {
+			l.NextCursor()
+			if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+				l.NextCursor()
+				return Token{Type: ExponentEquals, Value: "**="}
+			}
+			return Token{Type: Exponent, Value: "**"}
 		}
 		return Token{Type: Multiplication, Value: "*"}
 	case '/':
@@ -123,7 +130,13 @@ func (l *Lexer) Next() Token {
 			}
 		}
 		if utils.IsLetter(value) {
-			return Token{Type: Identifier, Value: l.readIdentifier(string(value))}
+			identifier := l.readIdentifier(string(value))
+			if identifier == "true" {
+				return Token{Type: True, Value: identifier}
+			} else if identifier == "false" {
+				return Token{Type: False, Value: identifier}
+			}
+			return Token{Type: Identifier, Value: identifier}
 		}
 		if utils.IsString(value) {
 			return Token{Type: String, Value: l.readString()}

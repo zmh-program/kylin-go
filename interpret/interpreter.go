@@ -212,6 +212,10 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return i.CountCall(token)
 	case Float:
 		return i.CountCall(token)
+	case True:
+		return true
+	case False:
+		return false
 	case String:
 		return token.Value
 	case Identifier:

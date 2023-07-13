@@ -1,22 +1,25 @@
 package interpret
 
 import (
-	"fmt"
+	"kylin/include"
+	"kylin/module"
 	"kylin/utils"
 	"strconv"
 )
 
 type Interpreter struct {
 	lexer  *Lexer
-	scope  *Scope
+	scope  *include.Scope
 	buffer interface{}
+	module *module.Manager
 }
 
-func NewInterpreter(module string, parent *Scope) *Interpreter {
-	data := utils.ReadKylinFile(module)
+func NewInterpreter(path string, parent *include.Scope) *Interpreter {
+	data := utils.ReadKylinFile(path)
 	return &Interpreter{
-		lexer: NewLexer(data),
-		scope: NewScope(parent),
+		lexer:  NewLexer(data),
+		scope:  include.NewScope(parent),
+		module: module.NewManager(),
 	}
 }
 
@@ -28,11 +31,11 @@ func (i *Interpreter) SetVariable(name string, value interface{}) {
 	i.scope.Set(name, value)
 }
 
-func (i *Interpreter) GetScope() *Scope {
+func (i *Interpreter) GetScope() *include.Scope {
 	return i.scope
 }
 
-func (i *Interpreter) SetScope(scope *Scope) {
+func (i *Interpreter) SetScope(scope *include.Scope) {
 	i.scope = scope
 }
 
@@ -211,6 +214,4 @@ func (i *Interpreter) Run() {
 	for !i.IsEnd() {
 		i.ExprNext()
 	}
-
-	fmt.Println(i.GetBuffer())
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"kylin/include"
 	"kylin/interpret"
 	"os"
 )
@@ -13,6 +14,9 @@ func main() {
 		file = os.Args[1]
 	}
 
-	runtime := interpret.NewInterpreter(file, nil)
+	runtime := interpret.NewInterpreter(
+		file,
+		include.NewGlobalScope(),
+	)
 	runtime.Run()
 }

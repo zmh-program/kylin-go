@@ -12,7 +12,7 @@ type Lexer struct {
 }
 
 func NewLexer(data string) *Lexer {
-	return &Lexer{data: data, cursor: 0, line: 0, column: 0}
+	return &Lexer{data: data, cursor: 0, line: 1, column: 0}
 }
 
 func (l *Lexer) NextCursor() {
@@ -133,15 +133,8 @@ func (l *Lexer) Peek() Token {
 	return token
 }
 
-func (l *Lexer) PeekNext() Token {
-	l.NextCursor()
-	token := l.Next()
-	l.cursor--
-	return token
-}
-
 func (l *Lexer) Skip() {
-	l.NextCursor()
+	l.Next()
 }
 
 func (l *Lexer) GetNextPtr() *Token {

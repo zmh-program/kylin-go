@@ -48,6 +48,14 @@ func (i *Interpreter) Skip() {
 	i.lexer.Skip()
 }
 
+func (i *Interpreter) GetCurrentLine() int {
+	return i.lexer.line
+}
+
+func (i *Interpreter) GetCurrentColumn() int {
+	return i.lexer.column
+}
+
 func (i *Interpreter) GetNextPtr() *Token {
 	return i.lexer.GetNextPtr()
 }
@@ -64,31 +72,33 @@ func (i *Interpreter) AssignCall(token *Token) bool {
 	switch peek.Type {
 	case Equals:
 		i.Skip()
-		i.SetVariable(token.Value, i.Expr(i.GetNextPtr()))
+		r := i.ExprNext()
+		fmt.Println(r)
+		i.SetVariable(token.Value, r)
 		return true
 	case PlusEquals:
 		i.Skip()
-		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)+i.Expr(i.GetNextPtr()).(float64))
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)+i.ExprNext().(float64))
 		return true
 	case MinusEquals:
 		i.Skip()
-		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)-i.Expr(i.GetNextPtr()).(float64))
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)-i.ExprNext().(float64))
 		return true
 	case TimesEquals:
 		i.Skip()
-		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)*i.Expr(i.GetNextPtr()).(float64))
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)*i.ExprNext().(float64))
 		return true
 	case DividedEquals:
 		i.Skip()
-		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)/i.Expr(i.GetNextPtr()).(float64))
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)/i.ExprNext().(float64))
 		return true
 	case ModuloEquals:
 		i.Skip()
-		i.SetVariable(token.Value, float64(int64(i.GetVariable(token.Value).(float64))%int64(i.Expr(i.GetNextPtr()).(float64))))
+		i.SetVariable(token.Value, float64(int64(i.GetVariable(token.Value).(float64))%int64(i.ExprNext().(float64))))
 		return true
 	case ExponentEquals:
 		i.Skip()
-		i.SetVariable(token.Value, utils.Pow(i.GetVariable(token.Value).(float64), i.Expr(i.GetNextPtr()).(float64)))
+		i.SetVariable(token.Value, utils.Pow(i.GetVariable(token.Value).(float64), i.ExprNext().(float64)))
 		return true
 	default:
 		return false
@@ -109,22 +119,24 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		}
 		return nil
 	case LeftParenthesis:
-		return i.Expr(i.lexer.GetNextPtr())
+		return i.ExprNext()
 	case RightParenthesis:
-		return i.Expr(i.lexer.GetNextPtr())
+		return i.ExprNext()
 	case Addition:
-		fmt.Println(i.GetBuffer())
-		return i.GetBuffer().(float64) + i.Expr(i.GetNextPtr()).(float64)
+		//fmt.Println(i.GetBuffer().(*Token).Value)
+		return i.GetBuffer().(float64) + i.ExprNext().(float64)
 	case Subtraction:
-		return i.GetBuffer().(float64) - i.Expr(i.GetNextPtr()).(float64)
+		return i.GetBuffer().(float64) - i.ExprNext().(float64)
 	case Multiplication:
-		return i.GetBuffer().(float64) * i.Expr(i.GetNextPtr()).(float64)
+		return i.GetBuffer().(float64) * i.ExprNext().(float64)
 	case Division:
-		return i.GetBuffer().(float64) / i.Expr(i.GetNextPtr()).(float64)
+		return i.GetBuffer().(float64) / i.ExprNext().(float64)
 	case Modulo:
-		return int(i.GetBuffer().(float64)) % int(i.Expr(i.GetNextPtr()).(float64))
+		return int(i.GetBuffer().(float64)) % int(i.ExprNext().(float64))
 	case Exponent:
-		return utils.Pow(i.GetBuffer().(float64), i.Expr(i.GetNextPtr()).(float64))
+		return utils.Pow(i.GetBuffer().(float64), i.ExprNext().(float64))
+	case EOF:
+		return nil
 	}
 	return token
 }
@@ -161,6 +173,6 @@ func (i *Interpreter) ExprNext() interface{} {
 
 func (i *Interpreter) Run() {
 	for !i.IsEnd() {
-		fmt.Println(i.ExprNext())
+		i.ExprNext()
 	}
 }

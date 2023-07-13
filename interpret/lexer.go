@@ -108,12 +108,14 @@ func (l *Lexer) Next() Token {
 		return Token{Type: And, Value: "&"}
 	case '|':
 		return Token{Type: Or, Value: "|"}
+	case '\r':
+		return l.Next()
 	case ' ':
 		return l.Next()
 	case '\n':
 		l.line++
 		l.column = 0
-		return Token{Type: Enter, Value: "\n"}
+		return l.Next()
 	case '\t':
 		return l.Next()
 	default:

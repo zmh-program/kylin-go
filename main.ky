@@ -1,4 +1,11 @@
 dim = 3
 a = dim ^ 2
 dim *= dim + 2 * 2
-print(all(true, false))
+print(all(true, false), {
+  "adf": 23,
+  "a": {
+    "b": 1
+    }
+  }
+)
+print(a, dim)

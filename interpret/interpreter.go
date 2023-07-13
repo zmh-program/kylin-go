@@ -1,9 +1,11 @@
 package interpret
 
 import (
+	"fmt"
 	"kylin/include"
 	"kylin/module"
 	"kylin/utils"
+	"log"
 	"strconv"
 )
 
@@ -206,6 +208,34 @@ func (i *Interpreter) ReadArray() []interface{} {
 	return array
 }
 
+func (i *Interpreter) ReadObject() map[string]interface{} {
+	object := make(map[string]interface{})
+	for {
+		if i.IsEnd() {
+			log.Fatalln("Object not closed")
+		}
+		if i.Peek().Type == RightBrace {
+			i.Skip()
+			break
+		}
+		key := i.Peek()
+		fmt.Println(key)
+		if key.Type != String {
+			log.Fatalln("Object key must be string")
+		}
+		i.Skip()
+		if i.Peek().Type != Colon {
+			log.Fatalln("Object key must be followed by colon")
+		}
+		i.Skip()
+		object[key.Value] = i.ExprNext()
+		if i.Peek().Type == Comma {
+			i.Skip()
+		}
+	}
+	return object
+}
+
 func (i *Interpreter) Expr(token *Token) interface{} {
 	switch token.Type {
 	case Integer:
@@ -228,6 +258,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return i.CountCall(token)
 	case LeftBracket:
 		return i.ReadArray()
+	case LeftBrace:
+		return i.ReadObject()
 	case Addition:
 		return i.GetBuffer().(float64) + i.ExprNext().(float64)
 	case Subtraction:
@@ -252,18 +284,6 @@ func (i *Interpreter) GetBuffer() interface{} {
 
 func (i *Interpreter) SetBuffer(token interface{}) {
 	i.buffer = token
-}
-
-func ReadUntilEnter(lexer *Lexer) string {
-	var result string
-	for {
-		token := lexer.Next()
-		if token.Type == Enter || token.Type == EOF {
-			break
-		}
-		result += token.Value
-	}
-	return result
 }
 
 func (i *Interpreter) IsEnd() bool {

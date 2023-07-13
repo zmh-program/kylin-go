@@ -9,8 +9,6 @@ type Token struct {
 
 const (
 	EOF TokenType = iota
-	Space
-	Enter
 	Integer
 	Float
 	String

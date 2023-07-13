@@ -7,10 +7,12 @@ import (
 type Lexer struct {
 	data   string
 	cursor int
+	line   int
+	column int
 }
 
 func NewLexer(data string) *Lexer {
-	return &Lexer{data: data, cursor: 0}
+	return &Lexer{data: data, cursor: 0, line: 0, column: 0}
 }
 
 func (l *Lexer) Next() Token {
@@ -95,6 +97,7 @@ func (l *Lexer) Next() Token {
 	case ' ':
 		return l.Next()
 	case '\n':
+		l.line++
 		return Token{Type: Enter, Value: "\n"}
 	case '\t':
 		return l.Next()

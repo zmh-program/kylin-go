@@ -52,6 +52,49 @@ func (i *Interpreter) GetNextPtr() *Token {
 	return i.lexer.GetNextPtr()
 }
 
+func (i *Interpreter) AssignCall(token *Token) bool {
+	if token.Type != Identifier {
+		return false
+	}
+	if i.IsEnd() {
+		return false
+	}
+
+	peek := i.Peek()
+	switch peek.Type {
+	case Equals:
+		i.Skip()
+		i.SetVariable(token.Value, i.Expr(i.GetNextPtr()))
+		return true
+	case PlusEquals:
+		i.Skip()
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)+i.Expr(i.GetNextPtr()).(float64))
+		return true
+	case MinusEquals:
+		i.Skip()
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)-i.Expr(i.GetNextPtr()).(float64))
+		return true
+	case TimesEquals:
+		i.Skip()
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)*i.Expr(i.GetNextPtr()).(float64))
+		return true
+	case DividedEquals:
+		i.Skip()
+		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)/i.Expr(i.GetNextPtr()).(float64))
+		return true
+	case ModuloEquals:
+		i.Skip()
+		i.SetVariable(token.Value, float64(int64(i.GetVariable(token.Value).(float64))%int64(i.Expr(i.GetNextPtr()).(float64))))
+		return true
+	case ExponentEquals:
+		i.Skip()
+		i.SetVariable(token.Value, utils.Pow(i.GetVariable(token.Value).(float64), i.Expr(i.GetNextPtr()).(float64)))
+		return true
+	default:
+		return false
+	}
+}
+
 func (i *Interpreter) Expr(token *Token) interface{} {
 	switch token.Type {
 	case Integer:
@@ -61,16 +104,16 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 	case String:
 		return token.Value
 	case Identifier:
-		if !i.IsEnd() && i.Peek().Type == Equals {
-			i.Skip()
-			i.SetVariable(token.Value, i.Expr(i.GetNextPtr()))
-			return nil
-		} else {
+		if !i.AssignCall(token) {
 			return i.GetVariable(token.Value)
 		}
+		return nil
 	case LeftParenthesis:
 		return i.Expr(i.lexer.GetNextPtr())
+	case RightParenthesis:
+		return i.Expr(i.lexer.GetNextPtr())
 	case Addition:
+		fmt.Println(i.GetBuffer())
 		return i.GetBuffer().(float64) + i.Expr(i.GetNextPtr()).(float64)
 	case Subtraction:
 		return i.GetBuffer().(float64) - i.Expr(i.GetNextPtr()).(float64)
@@ -82,8 +125,6 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return int(i.GetBuffer().(float64)) % int(i.Expr(i.GetNextPtr()).(float64))
 	case Exponent:
 		return utils.Pow(i.GetBuffer().(float64), i.Expr(i.GetNextPtr()).(float64))
-	case PlusEquals:
-		i.GetBuffer()
 	}
 	return token
 }

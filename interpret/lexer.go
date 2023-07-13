@@ -4,6 +4,8 @@ import (
 	"kylin/utils"
 )
 
+const EnableDecimal = false
+
 type Lexer struct {
 	data   string
 	cursor int
@@ -110,10 +112,14 @@ func (l *Lexer) Next() Token {
 	default:
 		if utils.IsDigit(value) {
 			value, decimal := l.readNumber(string(value))
-			if decimal {
-				return Token{Type: Float, Value: value}
+			if EnableDecimal {
+				if decimal {
+					return Token{Type: Float, Value: value}
+				} else {
+					return Token{Type: Integer, Value: value}
+				}
 			} else {
-				return Token{Type: Integer, Value: value}
+				return Token{Type: Float, Value: value}
 			}
 		}
 		if utils.IsLetter(value) {

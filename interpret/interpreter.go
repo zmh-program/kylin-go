@@ -73,7 +73,6 @@ func (i *Interpreter) AssignCall(token *Token) bool {
 	case Equals:
 		i.Skip()
 		r := i.ExprNext()
-		fmt.Println(r)
 		i.SetVariable(token.Value, r)
 		return true
 	case PlusEquals:
@@ -105,17 +104,55 @@ func (i *Interpreter) AssignCall(token *Token) bool {
 	}
 }
 
+func (i *Interpreter) CountCall(token *Token) interface{} {
+	var value interface{}
+	switch token.Type {
+	case Identifier:
+		value = i.GetVariable(token.Value)
+	case Integer:
+		value = utils.MustGet(strconv.ParseInt(token.Value, 10, 64))
+	case Float:
+		value = utils.MustGet(strconv.ParseFloat(token.Value, 64))
+	default:
+		value = token.Value
+	}
+
+	peek := i.Peek()
+	switch peek.Type {
+	case Addition:
+		i.Skip()
+		return value.(float64) + i.ExprNext().(float64)
+	case Subtraction:
+		i.Skip()
+		return value.(float64) - i.ExprNext().(float64)
+	case Multiplication:
+		i.Skip()
+		return value.(float64) * i.ExprNext().(float64)
+	case Division:
+		i.Skip()
+		return value.(float64) / i.ExprNext().(float64)
+	case Modulo:
+		i.Skip()
+		return float64(int64(value.(float64)) % int64(i.ExprNext().(float64)))
+	case Exponent:
+		i.Skip()
+		return utils.Pow(value.(float64), i.ExprNext().(float64))
+	default:
+		return value
+	}
+}
+
 func (i *Interpreter) Expr(token *Token) interface{} {
 	switch token.Type {
 	case Integer:
-		return utils.MustGet(strconv.Atoi(token.Value))
+		return i.CountCall(token)
 	case Float:
-		return utils.MustGet(strconv.ParseFloat(token.Value, 64))
+		return i.CountCall(token)
 	case String:
 		return token.Value
 	case Identifier:
 		if !i.AssignCall(token) {
-			return i.GetVariable(token.Value)
+			return i.CountCall(token)
 		}
 		return nil
 	case LeftParenthesis:
@@ -123,7 +160,6 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 	case RightParenthesis:
 		return i.ExprNext()
 	case Addition:
-		//fmt.Println(i.GetBuffer().(*Token).Value)
 		return i.GetBuffer().(float64) + i.ExprNext().(float64)
 	case Subtraction:
 		return i.GetBuffer().(float64) - i.ExprNext().(float64)
@@ -175,4 +211,6 @@ func (i *Interpreter) Run() {
 	for !i.IsEnd() {
 		i.ExprNext()
 	}
+
+	fmt.Println(i.GetBuffer())
 }

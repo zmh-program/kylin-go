@@ -1,2 +1,3 @@
-hi = "asdf"
-hi+ 1+ 1
+dim = 32
+dim *= dim + 2
+dim * 2 + 23

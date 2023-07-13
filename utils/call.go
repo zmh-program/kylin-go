@@ -9,6 +9,10 @@ func CallFunc(_fn interface{}, _args []interface{}) interface{} {
 
 	args := make([]reflect.Value, len(_args))
 	for i, arg := range _args {
+		if arg == nil {
+			args[i] = reflect.ValueOf(new(interface{})).Elem()
+			continue
+		}
 		args[i] = reflect.ValueOf(arg)
 	}
 

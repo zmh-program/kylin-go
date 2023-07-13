@@ -133,12 +133,16 @@ func (l *Lexer) Next() Token {
 		}
 		if utils.IsLetter(value) {
 			identifier := l.readIdentifier(string(value))
-			if identifier == "true" {
-				return Token{Type: True, Value: identifier}
-			} else if identifier == "false" {
-				return Token{Type: False, Value: identifier}
+			switch identifier {
+			case "true":
+				return Token{Type: True, Value: "true"}
+			case "false":
+				return Token{Type: False, Value: "false"}
+			case "null":
+				return Token{Type: Null, Value: "null"}
+			default:
+				return Token{Type: Identifier, Value: identifier}
 			}
-			return Token{Type: Identifier, Value: identifier}
 		}
 		if utils.IsString(value) {
 			return Token{Type: String, Value: l.readString()}

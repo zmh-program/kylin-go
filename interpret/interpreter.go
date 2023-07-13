@@ -1,7 +1,6 @@
 package interpret
 
 import (
-	"fmt"
 	"kylin/include"
 	"kylin/module"
 	"kylin/utils"
@@ -219,7 +218,6 @@ func (i *Interpreter) ReadObject() map[string]interface{} {
 			break
 		}
 		key := i.Peek()
-		fmt.Println(key)
 		if key.Type != String {
 			log.Fatalln("Object key must be string")
 		}
@@ -246,6 +244,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return true
 	case False:
 		return false
+	case Null:
+		return nil
 	case String:
 		return token.Value
 	case Identifier:

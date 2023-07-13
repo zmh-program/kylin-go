@@ -14,6 +14,7 @@ const (
 	String
 	True
 	False
+	Null
 	Identifier
 	Addition
 	Subtraction

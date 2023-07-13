@@ -8,4 +8,5 @@ print(all(true, false), {
     }
   }
 )
-print(a, dim)
+b = null
+print(null, a)

@@ -267,7 +267,7 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 	case LeftBrace:
 		return i.ReadObject()
 	case Function:
-		return utils.Output(i.ReadFunction())
+		return i.ReadFunction()
 	case Subtraction:
 		return -i.ExprNext().(float64)
 	case EOF:

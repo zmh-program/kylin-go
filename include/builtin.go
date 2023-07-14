@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-type KyFunc func(...interface{})
-
 func NewGlobalScope() *Scope {
 	scope := NewScope(nil)
 

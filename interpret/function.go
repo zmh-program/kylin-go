@@ -1,15 +1,29 @@
 package interpret
 
+import (
+	"kylin/include"
+	"kylin/module"
+)
+
 type KyFunction struct {
 	Name   string
 	Params []string
 	Body   string
 }
 
-func NewKyFunction(name string, params []string) *KyFunction {
-	return &KyFunction{
-		Name:   name,
-		Params: params,
+func (k *KyFunction) CallWrapper(scope *include.Scope) interface{} {
+	return func(args ...interface{}) interface{} {
+		interpreter := &Interpreter{
+			lexer:  NewLexer(k.Body),
+			scope:  include.NewScope(scope),
+			module: module.NewManager(),
+		}
+
+		for i, param := range k.Params {
+			interpreter.SetVariable(param, args[i])
+		}
+		interpreter.Run()
+		return interpreter.buffer
 	}
 }
 
@@ -79,5 +93,9 @@ func (i *Interpreter) ReadFunction() *KyFunction {
 		Params: i.ReadFunctionParams(),
 		Body:   i.ReadFunctionBody(),
 	}
+	i.SetVariable(
+		function.Name,
+		function.CallWrapper(i.GetScope()),
+	)
 	return function
 }

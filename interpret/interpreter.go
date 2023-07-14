@@ -266,18 +266,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return i.ReadArray()
 	case LeftBrace:
 		return i.ReadObject()
-	case Addition:
-		return i.GetBuffer().(float64) + i.ExprNext().(float64)
 	case Subtraction:
-		return i.GetBuffer().(float64) - i.ExprNext().(float64)
-	case Multiplication:
-		return i.GetBuffer().(float64) * i.ExprNext().(float64)
-	case Division:
-		return i.GetBuffer().(float64) / i.ExprNext().(float64)
-	case Modulo:
-		return int(i.GetBuffer().(float64)) % int(i.ExprNext().(float64))
-	case Exponent:
-		return utils.Pow(i.GetBuffer().(float64), i.ExprNext().(float64))
+		return -i.ExprNext().(float64)
 	case EOF:
 		return nil
 	}

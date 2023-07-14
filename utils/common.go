@@ -1,9 +1,5 @@
 package utils
 
-import (
-	"fmt"
-)
-
 func IsLetter(n byte) bool {
 	return (n >= 'a' && n <= 'z') || (n >= 'A' && n <= 'Z')
 }
@@ -22,26 +18,6 @@ func IsRegular(n byte) bool {
 
 func IsString(n byte) bool {
 	return n == '"' || n == '\''
-}
-
-func ToString(data interface{}) string {
-	switch data.(type) {
-	case string:
-		return data.(string)
-	case int:
-		return fmt.Sprintf("%d", data.(int))
-	case float64:
-		return fmt.Sprintf("%f", data.(float64))
-	case bool:
-		return fmt.Sprintf("%v", data.(bool))
-	case []interface{}:
-		return fmt.Sprintf("%v", data.([]interface{}))
-	case map[string]interface{}:
-		return fmt.Sprintf("%v", data.(map[string]interface{}))
-	case nil:
-		return "null"
-	}
-	return fmt.Sprintf("%v", data)
 }
 
 func ToBool(data interface{}) bool {

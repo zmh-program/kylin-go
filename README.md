@@ -87,6 +87,45 @@ while n < 10 {
 }
 ```
 
+#### 5. 数组
+```kylin
+arr = [1, 2, 3, 4, 5]
+
+for i in arr {
+  ...
+}
+
+for i in ["hello", "world"] {
+  print(i)
+}
+```
+
+#### 6. 异常截获
+```
+for i in range(1,10,2) {
+    try {
+        print(id)
+    } catch {
+        print("a", error, "b")
+    }
+}
+```
+> ```shell
+> $ go run main.go
+> a ReferenceError(message="Variable id not defined", type="ReferenceError",
+>  line=11, column=22) b
+> a ReferenceError(message="Variable id not defined", type="ReferenceError",
+>  line=34, column=22) b
+> a ReferenceError(message="Variable id not defined", type="ReferenceError",
+>  line=57, column=22) b
+> a ReferenceError(message="Variable id not defined", type="ReferenceError",
+>  line=80, column=22) b
+> a ReferenceError(message="Variable id not defined", type="ReferenceError",
+>  line=103, column=22) b
+> a ReferenceError(message="Variable id not defined", type="ReferenceError",
+>  line=123, column=22) b
+> ```
+
 ## 运行
 ```shell
 kylin main.ky
@@ -116,6 +155,7 @@ kylin main.ky
 ## 内置函数
 - `print` 打印
 - `input` 输入
+- `str` 字符串
 - `range` 范围
 - `len` 长度
 - `sum` 求和

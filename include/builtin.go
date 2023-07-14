@@ -14,6 +14,7 @@ func NewGlobalScope() *Scope {
 	{
 		scope.Set("print", Print)
 		scope.Set("input", Input)
+		scope.Set("str", String)
 		scope.Set("sum", Sum)
 		scope.Set("max", Max)
 		scope.Set("min", Min)
@@ -37,7 +38,7 @@ func NewGlobalScope() *Scope {
 func Print(obj ...interface{}) interface{} {
 	var str []string
 	for _, v := range obj {
-		str = append(str, utils.ToString(v))
+		str = append(str, String(v))
 	}
 	println(strings.Join(str, " "))
 
@@ -163,7 +164,7 @@ func Split(str string, sep string) interface{} {
 func Join(arr []interface{}, sep string) interface{} {
 	var str []string
 	for _, v := range arr {
-		str = append(str, utils.ToString(v))
+		str = append(str, String(v))
 	}
 	return strings.Join(str, sep)
 }
@@ -224,4 +225,26 @@ func Input(message ...interface{}) interface{} {
 
 func Exit(code int) {
 	os.Exit(code)
+}
+
+func String(data interface{}) string {
+	switch data.(type) {
+	case string:
+		return data.(string)
+	case int:
+		return fmt.Sprintf("%d", data.(int))
+	case float64:
+		return fmt.Sprintf("%f", data.(float64))
+	case bool:
+		return fmt.Sprintf("%v", data.(bool))
+	case []interface{}:
+		return fmt.Sprintf("%v", data.([]interface{}))
+	case map[string]interface{}:
+		return fmt.Sprintf("%v", data.(map[string]interface{}))
+	case nil:
+		return "null"
+	case *Exception:
+		return fmt.Sprintf(data.(*Exception).Repr())
+	}
+	return fmt.Sprintf("%v", data)
 }

@@ -96,6 +96,24 @@ func (i *Interpreter) CountCall(token interface{}) interface{} {
 	case Or:
 		i.Skip()
 		return utils.ToBool(value) || utils.ToBool(i.ExprNext())
+	case IsEquals:
+		i.Skip()
+		return value == i.ExprNext()
+	case NotEquals:
+		i.Skip()
+		return value != i.ExprNext()
+	case GreaterThan:
+		i.Skip()
+		return value.(float64) > i.ExprNext().(float64)
+	case LessThan:
+		i.Skip()
+		return value.(float64) < i.ExprNext().(float64)
+	case GreaterThanOrEqual:
+		i.Skip()
+		return value.(float64) >= i.ExprNext().(float64)
+	case LessThanOrEqual:
+		i.Skip()
+		return value.(float64) <= i.ExprNext().(float64)
 	default:
 		return value
 	}

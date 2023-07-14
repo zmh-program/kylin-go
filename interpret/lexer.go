@@ -122,6 +122,18 @@ func (l *Lexer) Next() Token {
 		return l.Next()
 	case '\t':
 		return l.Next()
+	case '>':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.NextCursor()
+			return Token{Type: GreaterThanOrEqual, Value: ">="}
+		}
+		return Token{Type: GreaterThan, Value: ">"}
+	case '<':
+		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+			l.NextCursor()
+			return Token{Type: LessThanOrEqual, Value: "<="}
+		}
+		return Token{Type: LessThan, Value: "<"}
 	default:
 		if utils.IsDigit(value) {
 			value, decimal := l.readNumber(string(value))

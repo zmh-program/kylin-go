@@ -97,6 +97,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return i.SetReturn(i.ExprNext())
 	case Subtraction:
 		return -i.ExprNext().(float64)
+	case If:
+		return i.ConditionCall()
 	case EOF:
 		return nil
 	}

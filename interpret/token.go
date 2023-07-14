@@ -54,4 +54,8 @@ const (
 	Not
 	IsEquals
 	NotEquals
+	GreaterThan
+	LessThan
+	GreaterThanOrEqual
+	LessThanOrEqual
 )

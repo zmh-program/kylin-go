@@ -27,6 +27,7 @@ const (
 	Break
 	Continue
 	Import
+	Use
 	Addition
 	Subtraction
 	Multiplication

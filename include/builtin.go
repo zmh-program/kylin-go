@@ -1,6 +1,7 @@
 package include
 
 import (
+	"fmt"
 	"kylin/utils"
 	"strings"
 	"time"
@@ -11,6 +12,7 @@ func NewGlobalScope() *Scope {
 
 	{
 		scope.Set("print", Print)
+		scope.Set("input", Input)
 		scope.Set("sum", Sum)
 		scope.Set("max", Max)
 		scope.Set("min", Min)
@@ -23,6 +25,8 @@ func NewGlobalScope() *Scope {
 		scope.Set("join", Join)
 		scope.Set("time", Time)
 		scope.Set("timenano", TimeNano)
+		scope.Set("sleep", Sleep)
+		scope.Set("range", Range)
 	}
 
 	return scope
@@ -120,7 +124,7 @@ func Type(obj interface{}) interface{} {
 	case []interface{}:
 		return "array"
 	case map[string]interface{}:
-		return "map"
+		return "object"
 	default:
 		return "object"
 	}
@@ -173,4 +177,49 @@ func Time() interface{} {
 
 func TimeNano() interface{} {
 	return float64(time.Now().UnixNano())
+}
+
+func Sleep(ms int) {
+	time.Sleep(time.Duration(ms) * time.Millisecond)
+}
+
+func Range(args ...interface{}) interface{} {
+	start := 0.
+	end := 0.
+	step := 1.
+
+	switch len(args) {
+	case 1:
+		end = args[0].(float64)
+	case 2:
+		start, end = args[0].(float64), args[1].(float64)
+	case 3:
+		start, end, step = args[0].(float64), args[1].(float64), args[2].(float64)
+	}
+
+	var arr []interface{}
+	for i := start; i < end; i += step {
+		arr = append(arr, i)
+		if step < 0 && i <= end {
+			break
+		} else if i >= end {
+			break
+		}
+
+		if i+step >= end {
+			arr = append(arr, i+step)
+			break
+		}
+	}
+	return arr
+}
+
+func Input(message ...interface{}) interface{} {
+	fmt.Print(message...)
+	var input string
+	_, err := fmt.Scanln(&input)
+	if err != nil {
+		return nil
+	}
+	return input
 }

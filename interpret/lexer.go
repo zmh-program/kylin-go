@@ -178,6 +178,8 @@ func (l *Lexer) Next() Token {
 				return Token{Type: Continue, Value: "continue"}
 			case "import":
 				return Token{Type: Import, Value: "import"}
+			case "use":
+				return Token{Type: Use, Value: "use"}
 			default:
 				return Token{Type: Identifier, Value: identifier}
 			}

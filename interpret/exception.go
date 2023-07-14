@@ -61,3 +61,7 @@ func (i *Interpreter) Throw(name string, message string) interface{} {
 		return Raise(name, mes)
 	}
 }
+
+func (i *Interpreter) ThrowError(message string) interface{} {
+	return i.Throw("Error", message)
+}

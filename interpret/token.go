@@ -28,6 +28,8 @@ const (
 	Continue
 	Import
 	Use
+	Try
+	Catch
 	Addition
 	Subtraction
 	Multiplication

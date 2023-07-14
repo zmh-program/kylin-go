@@ -1,5 +1,9 @@
 use 'chinese'
 
 for i in range(1,10,2) {
-    print(i)s
+    try {
+        print(ids, "a")
+    } catch {
+        print("error")
+    }
 }

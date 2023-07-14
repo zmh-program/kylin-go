@@ -1,7 +1,12 @@
 n = timenano()
 
-fn asdf(a, b) {
-    return a + b
+fn ae(k) {
+    print(k)
 }
 
-print(asdf(1,3))
+fn add(a, b) {
+    k = 1
+    print(ae(a + b))
+}
+
+print(add(1,3))

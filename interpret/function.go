@@ -71,6 +71,7 @@ func (i *Interpreter) ReadFunctionParams() []string {
 
 func (i *Interpreter) ReadFunctionBody() string {
 	body := ""
+	i.Skip()
 	for {
 		i.lexer.NextCursor()
 		if i.IsEnd() {

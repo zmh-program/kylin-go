@@ -1,6 +1,7 @@
 package main
 
 import (
+	"kylin/i18n"
 	"kylin/include"
 	"kylin/interpret"
 	"os"
@@ -17,6 +18,7 @@ func main() {
 	runtime := interpret.NewInterpreter(
 		file,
 		include.NewGlobalScope(),
+		i18n.NewManager(),
 	)
 	runtime.Run()
 }

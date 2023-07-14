@@ -111,19 +111,19 @@ for i in range(1,10,2) {
 }
 ```
 > ```shell
-> $ go run main.go
+> $ kylin test.ky
 > a ReferenceError(message="Variable id not defined", type="ReferenceError",
->  line=11, column=22) b
+>  line=3, column=22) b
 > a ReferenceError(message="Variable id not defined", type="ReferenceError",
->  line=34, column=22) b
+>  line=3, column=22) b
 > a ReferenceError(message="Variable id not defined", type="ReferenceError",
->  line=57, column=22) b
+>  line=3, column=22) b
 > a ReferenceError(message="Variable id not defined", type="ReferenceError",
->  line=80, column=22) b
+>  line=3, column=22) b
 > a ReferenceError(message="Variable id not defined", type="ReferenceError",
->  line=103, column=22) b
+>  line=3, column=22) b
 > a ReferenceError(message="Variable id not defined", type="ReferenceError",
->  line=123, column=22) b
+>  line=3, column=22) b
 > ```
 
 ## 运行
@@ -165,6 +165,7 @@ kylin main.ky
 - `all` 全部为真
 - `any` 任意为真
 - `join` 连接字符串
+- `split` 分割字符串
 - `type` 类型
 - `time` 时间 (ms)
 - `sleep` 阻塞等待 (ms)

@@ -1,0 +1,2 @@
+zmh-program
+./configure --prefix=/usr/local/zmh-program

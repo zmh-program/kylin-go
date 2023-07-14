@@ -1,6 +1,7 @@
 package interpret
 
 import (
+	"kylin/i18n"
 	"kylin/include"
 	"kylin/module"
 	"kylin/utils"
@@ -12,12 +13,13 @@ type KyFunction struct {
 	Body   string
 }
 
-func (k *KyFunction) CallWrapper(scope *include.Scope) interface{} {
+func (k *KyFunction) CallWrapper(scope *include.Scope, i18n *i18n.Manager) interface{} {
 	return func(args ...interface{}) interface{} {
 		interpreter := &Interpreter{
 			lexer:  NewLexer(k.Body),
 			scope:  include.NewScope(scope),
 			module: module.NewManager(),
+			i18n:   i18n,
 		}
 
 		for i, param := range k.Params {
@@ -96,7 +98,7 @@ func (i *Interpreter) ReadFunction() *KyFunction {
 	}
 	i.SetVariable(
 		function.Name,
-		function.CallWrapper(i.GetScope()),
+		function.CallWrapper(i.GetScope(), i.GetI18n()),
 	)
 	return function
 }

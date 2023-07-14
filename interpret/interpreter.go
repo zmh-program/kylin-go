@@ -1,6 +1,7 @@
 package interpret
 
 import (
+	"kylin/i18n"
 	"kylin/include"
 	"kylin/module"
 	"kylin/utils"
@@ -14,14 +15,16 @@ type Interpreter struct {
 	ret     interface{}
 	caching bool
 	module  *module.Manager
+	i18n    *i18n.Manager
 }
 
-func NewInterpreter(path string, parent *include.Scope) *Interpreter {
+func NewInterpreter(path string, parent *include.Scope, i18n *i18n.Manager) *Interpreter {
 	data := utils.ReadKylinFile(path)
 	return &Interpreter{
 		lexer:  NewLexer(data),
 		scope:  include.NewScope(parent),
 		module: module.NewManager(),
+		i18n:   i18n,
 	}
 }
 
@@ -43,6 +46,22 @@ func (i *Interpreter) GetScope() *include.Scope {
 
 func (i *Interpreter) SetScope(scope *include.Scope) {
 	i.scope = scope
+}
+
+func (i *Interpreter) GetModule() *module.Manager {
+	return i.module
+}
+
+func (i *Interpreter) SetModule(module *module.Manager) {
+	i.module = module
+}
+
+func (i *Interpreter) GetI18n() *i18n.Manager {
+	return i.i18n
+}
+
+func (i *Interpreter) SetI18n(i18n *i18n.Manager) {
+	i.i18n = i18n
 }
 
 func (i *Interpreter) Next() Token {

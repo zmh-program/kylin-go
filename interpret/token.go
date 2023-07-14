@@ -17,6 +17,7 @@ const (
 	Null
 	Identifier
 	Function
+	Return
 	Addition
 	Subtraction
 	Multiplication

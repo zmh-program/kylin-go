@@ -22,8 +22,7 @@ func (k *KyFunction) CallWrapper(scope *include.Scope) interface{} {
 		for i, param := range k.Params {
 			interpreter.SetVariable(param, args[i])
 		}
-		interpreter.Run()
-		return interpreter.buffer
+		return interpreter.Run()
 	}
 }
 

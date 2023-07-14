@@ -146,6 +146,8 @@ func (l *Lexer) Next() Token {
 				return Token{Type: Null, Value: "null"}
 			case "fn":
 				return Token{Type: Function, Value: "fn"}
+			case "return":
+				return Token{Type: Return, Value: "return"}
 			default:
 				return Token{Type: Identifier, Value: identifier}
 			}

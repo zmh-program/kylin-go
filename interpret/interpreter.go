@@ -12,6 +12,7 @@ type Interpreter struct {
 	lexer  *Lexer
 	scope  *include.Scope
 	buffer interface{}
+	ret    interface{}
 	module *module.Manager
 }
 
@@ -268,6 +269,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return i.ReadObject()
 	case Function:
 		return i.ReadFunction()
+	case Return:
+		return i.SetReturn(i.ExprNext())
 	case Subtraction:
 		return -i.ExprNext().(float64)
 	case EOF:
@@ -284,6 +287,15 @@ func (i *Interpreter) SetBuffer(token interface{}) {
 	i.buffer = token
 }
 
+func (i *Interpreter) GetReturn() interface{} {
+	return i.ret
+}
+
+func (i *Interpreter) SetReturn(token interface{}) interface{} {
+	i.ret = token
+	return token
+}
+
 func (i *Interpreter) IsEnd() bool {
 	return i.lexer.IsEnd()
 }
@@ -294,8 +306,9 @@ func (i *Interpreter) ExprNext() interface{} {
 	return res
 }
 
-func (i *Interpreter) Run() {
+func (i *Interpreter) Run() interface{} {
 	for !i.IsEnd() {
 		i.ExprNext()
 	}
+	return i.GetReturn()
 }

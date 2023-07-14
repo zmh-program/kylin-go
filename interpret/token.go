@@ -16,6 +16,7 @@ const (
 	False
 	Null
 	Identifier
+	Function
 	Addition
 	Subtraction
 	Multiplication

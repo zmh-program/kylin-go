@@ -1,2 +1,6 @@
 n = timenano()
 print(-1, "ns")
+
+fn asdf(a, b) {
+    return a + b
+}

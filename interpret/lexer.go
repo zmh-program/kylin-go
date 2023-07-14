@@ -22,6 +22,10 @@ func (l *Lexer) NextCursor() {
 	l.column++
 }
 
+func (l *Lexer) GetByte() byte {
+	return l.data[l.cursor]
+}
+
 func (l *Lexer) Next() Token {
 	if l.cursor >= len(l.data) {
 		return Token{Type: EOF, Value: ""}
@@ -140,6 +144,8 @@ func (l *Lexer) Next() Token {
 				return Token{Type: False, Value: "false"}
 			case "null":
 				return Token{Type: Null, Value: "null"}
+			case "fn":
+				return Token{Type: Function, Value: "fn"}
 			default:
 				return Token{Type: Identifier, Value: identifier}
 			}

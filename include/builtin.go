@@ -3,6 +3,7 @@ package include
 import (
 	"kylin/utils"
 	"strings"
+	"time"
 )
 
 type KyFunc func(...interface{})
@@ -21,6 +22,9 @@ func NewGlobalScope() *Scope {
 		scope.Set("all", All)
 		scope.Set("any", Any)
 		scope.Set("split", Split)
+		scope.Set("join", Join)
+		scope.Set("time", Time)
+		scope.Set("timenano", TimeNano)
 	}
 
 	return scope
@@ -129,6 +133,9 @@ func Abs(num float64) interface{} {
 
 func All(args ...interface{}) interface{} {
 	for _, v := range args {
+		if v == nil {
+			return false
+		}
 		if !v.(bool) {
 			return false
 		}
@@ -147,4 +154,21 @@ func Any(args ...interface{}) interface{} {
 
 func Split(str string, sep string) interface{} {
 	return strings.Split(str, sep)
+}
+
+func Join(arr []interface{}, sep string) interface{} {
+	var str []string
+	for _, v := range arr {
+		str = append(str, utils.ToString(v))
+	}
+	return strings.Join(str, sep)
+}
+
+func Time() interface{} {
+	nano := time.Now().UnixNano()
+	return float64(nano / int64(time.Millisecond))
+}
+
+func TimeNano() interface{} {
+	return float64(time.Now().UnixNano())
 }

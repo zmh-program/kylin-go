@@ -94,7 +94,7 @@ func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
 	}
 
 	resp := utils.CallFunc(i.GetVariable(token.Value), param)
-	return true, resp
+	return true, i.CountCall(resp)
 }
 
 func (i *Interpreter) AssignCall(token *Token) bool {
@@ -141,17 +141,23 @@ func (i *Interpreter) AssignCall(token *Token) bool {
 	}
 }
 
-func (i *Interpreter) CountCall(token *Token) interface{} {
+func (i *Interpreter) CountCall(token interface{}) interface{} {
 	var value interface{}
-	switch token.Type {
-	case Identifier:
-		value = i.GetVariable(token.Value)
-	case Integer:
-		value = utils.MustGet(strconv.ParseInt(token.Value, 10, 64))
-	case Float:
-		value = utils.MustGet(strconv.ParseFloat(token.Value, 64))
+	switch (token).(type) {
+	case *Token:
+		token := token.(*Token)
+		switch token.Type {
+		case Identifier:
+			value = i.GetVariable(token.Value)
+		case Integer:
+			value = utils.MustGet(strconv.ParseInt(token.Value, 10, 64))
+		case Float:
+			value = utils.MustGet(strconv.ParseFloat(token.Value, 64))
+		default:
+			value = token.Value
+		}
 	default:
-		value = token.Value
+		value = token
 	}
 
 	peek := i.Peek()

@@ -3,6 +3,7 @@ package interpret
 import (
 	"kylin/include"
 	"kylin/module"
+	"kylin/utils"
 )
 
 type KyFunction struct {
@@ -98,4 +99,37 @@ func (i *Interpreter) ReadFunction() *KyFunction {
 		function.CallWrapper(i.GetScope()),
 	)
 	return function
+}
+
+func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
+	if token.Type != Identifier {
+		return false, nil
+	}
+
+	if i.IsEnd() {
+		return false, nil
+	}
+
+	if i.Peek().Type != LeftParenthesis {
+		return false, nil
+	}
+	i.Skip()
+
+	param := make([]interface{}, 0)
+	for {
+		if i.IsEnd() {
+			return false, nil
+		}
+		if i.Peek().Type == RightParenthesis {
+			i.Skip()
+			break
+		}
+		param = append(param, i.ExprNext())
+		if i.Peek().Type == Comma {
+			i.Skip()
+		}
+	}
+
+	resp := utils.CallFunc(i.GetVariable(token.Value), param)
+	return true, i.CountCall(resp)
 }

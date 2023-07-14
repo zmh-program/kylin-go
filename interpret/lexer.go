@@ -148,6 +148,22 @@ func (l *Lexer) Next() Token {
 				return Token{Type: Function, Value: "fn"}
 			case "return":
 				return Token{Type: Return, Value: "return"}
+			case "if":
+				return Token{Type: If, Value: "if"}
+			case "elif":
+				return Token{Type: Elif, Value: "elif"}
+			case "else":
+				return Token{Type: Else, Value: "else"}
+			case "for":
+				return Token{Type: For, Value: "for"}
+			case "while":
+				return Token{Type: While, Value: "while"}
+			case "break":
+				return Token{Type: Break, Value: "break"}
+			case "continue":
+				return Token{Type: Continue, Value: "continue"}
+			case "import":
+				return Token{Type: Import, Value: "import"}
 			default:
 				return Token{Type: Identifier, Value: identifier}
 			}

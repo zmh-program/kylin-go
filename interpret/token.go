@@ -18,6 +18,14 @@ const (
 	Identifier
 	Function
 	Return
+	If
+	Elif
+	Else
+	For
+	While
+	Break
+	Continue
+	Import
 	Addition
 	Subtraction
 	Multiplication

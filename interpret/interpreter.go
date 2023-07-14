@@ -65,39 +65,6 @@ func (i *Interpreter) GetNextPtr() *Token {
 	return i.lexer.GetNextPtr()
 }
 
-func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
-	if token.Type != Identifier {
-		return false, nil
-	}
-
-	if i.IsEnd() {
-		return false, nil
-	}
-
-	if i.Peek().Type != LeftParenthesis {
-		return false, nil
-	}
-	i.Skip()
-
-	param := make([]interface{}, 0)
-	for {
-		if i.IsEnd() {
-			return false, nil
-		}
-		if i.Peek().Type == RightParenthesis {
-			i.Skip()
-			break
-		}
-		param = append(param, i.ExprNext())
-		if i.Peek().Type == Comma {
-			i.Skip()
-		}
-	}
-
-	resp := utils.CallFunc(i.GetVariable(token.Value), param)
-	return true, i.CountCall(resp)
-}
-
 func (i *Interpreter) AssignCall(token *Token) bool {
 	if token.Type != Identifier {
 		return false
@@ -181,6 +148,12 @@ func (i *Interpreter) CountCall(token interface{}) interface{} {
 	case Exponent:
 		i.Skip()
 		return utils.Pow(value.(float64), i.ExprNext().(float64))
+	case And:
+		i.Skip()
+		return utils.ToBool(value) && utils.ToBool(i.ExprNext())
+	case Or:
+		i.Skip()
+		return utils.ToBool(value) || utils.ToBool(i.ExprNext())
 	default:
 		return value
 	}

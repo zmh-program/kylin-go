@@ -17,6 +17,9 @@ func (i *Interpreter) ConditionCall() interface{} {
 				i.Skip()
 				break
 			}
+			if n := i.Peek(); n.Type == Continue || n.Type == Break {
+				return n
+			}
 			i.ExprNext()
 			if i.Peek().Type == Comma {
 				i.Skip()
@@ -63,6 +66,7 @@ func (i *Interpreter) ConditionCall() interface{} {
 func (i *Interpreter) WhileCall() interface{} {
 	cursor := i.lexer.cursor
 	condition := utils.ToBool(i.ExprNext())
+
 	if condition {
 		i.Skip()
 		for {
@@ -73,7 +77,16 @@ func (i *Interpreter) WhileCall() interface{} {
 				i.Skip()
 				break
 			}
+
+			if i.Peek().Type == Break {
+				return nil
+			} else if i.Peek().Type == Continue {
+				i.Skip()
+				break
+			}
+
 			i.ExprNext()
+
 			if i.Peek().Type == Comma {
 				i.Skip()
 			}
@@ -122,8 +135,7 @@ func (i *Interpreter) ForCall() interface{} {
 
 	for {
 		i.SetVariable(param, array[idx])
-		idx++
-		if idx >= len(array) {
+		if idx++; idx >= len(array) {
 			break
 		}
 
@@ -135,6 +147,13 @@ func (i *Interpreter) ForCall() interface{} {
 				i.Skip()
 				break
 			}
+			if i.Peek().Type == Break {
+				return nil
+			} else if i.Peek().Type == Continue {
+				i.Skip()
+				break
+			}
+
 			i.ExprNext()
 			if i.Peek().Type == Comma {
 				i.Skip()

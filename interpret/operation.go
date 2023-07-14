@@ -1,8 +1,8 @@
 package interpret
 
 import (
-	"fmt"
 	"kylin/utils"
+	"log"
 )
 
 func (i *Interpreter) ConditionCall() interface{} {
@@ -11,13 +11,12 @@ func (i *Interpreter) ConditionCall() interface{} {
 		i.Skip()
 		for {
 			if i.IsEnd() {
-				panic("Condition not closed")
+				log.Fatalln("Condition not closed")
 			}
-			if i.Peek().Type == RightParenthesis {
+			if i.Peek().Type == RightBrace {
 				i.Skip()
 				break
 			}
-			fmt.Println(i.Peek())
 			i.ExprNext()
 			if i.Peek().Type == Comma {
 				i.Skip()
@@ -27,20 +26,23 @@ func (i *Interpreter) ConditionCall() interface{} {
 		i.Skip()
 		for {
 			if i.IsEnd() {
-				panic("Condition not closed")
+				log.Fatalln("Condition not closed")
 			}
-			if i.Peek().Type == RightParenthesis {
+
+			if i.Peek().Type == RightBrace {
 				i.Skip()
 				break
 			}
+			i.Skip()
 		}
 		if i.Peek().Type == Else {
+			i.Skip()
 			i.Skip()
 			for {
 				if i.IsEnd() {
 					panic("Condition not closed")
 				}
-				if i.Peek().Type == RightParenthesis {
+				if i.Peek().Type == RightBrace {
 					i.Skip()
 					break
 				}
@@ -51,6 +53,7 @@ func (i *Interpreter) ConditionCall() interface{} {
 				}
 			}
 		} else if i.Peek().Type == Elif {
+			i.Skip()
 			i.ConditionCall()
 		}
 	}

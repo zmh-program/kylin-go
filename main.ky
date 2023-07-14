@@ -1,4 +1,6 @@
-a = 1
-if a > 1 {
+a = 31
+if a < 1 {
   print(a)
+} elif a > 1 {
+    print("a is greater than 1")
 }

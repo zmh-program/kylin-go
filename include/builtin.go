@@ -37,10 +37,6 @@ func NewGlobalScope() *Scope {
 func Print(obj ...interface{}) interface{} {
 	var str []string
 	for _, v := range obj {
-		if v == nil {
-			str = append(str, "null")
-			continue
-		}
 		str = append(str, utils.ToString(v))
 	}
 	println(strings.Join(str, " "))

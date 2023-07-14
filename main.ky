@@ -2,8 +2,8 @@ use 'chinese'
 
 for i in range(1,10,2) {
     try {
-        print(ids, "a")
+        print(id)
     } catch {
-        print("error")
+        print("a", error, "b")
     }
 }

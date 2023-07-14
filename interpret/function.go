@@ -130,6 +130,9 @@ func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
 		}
 	}
 
+	if i.IsException() {
+		return false, nil
+	}
 	resp := utils.CallFunc(i.GetVariable(token.Value), param)
 	return true, i.CountCall(resp)
 }

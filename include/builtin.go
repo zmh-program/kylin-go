@@ -3,6 +3,7 @@ package include
 import (
 	"fmt"
 	"kylin/utils"
+	"os"
 	"strings"
 	"time"
 )
@@ -27,6 +28,7 @@ func NewGlobalScope() *Scope {
 		scope.Set("timenano", TimeNano)
 		scope.Set("sleep", Sleep)
 		scope.Set("range", Range)
+		scope.Set("exit", Exit)
 	}
 
 	return scope
@@ -222,4 +224,8 @@ func Input(message ...interface{}) interface{} {
 		return nil
 	}
 	return input
+}
+
+func Exit(code int) {
+	os.Exit(code)
 }

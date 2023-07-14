@@ -101,6 +101,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return i.ConditionCall()
 	case While:
 		return i.WhileCall()
+	case For:
+		return i.ForCall()
 	case EOF:
 		return nil
 	}

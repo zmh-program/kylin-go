@@ -168,6 +168,8 @@ func (l *Lexer) Next() Token {
 				return Token{Type: Else, Value: "else"}
 			case "for":
 				return Token{Type: For, Value: "for"}
+			case "in":
+				return Token{Type: In, Value: "in"}
 			case "while":
 				return Token{Type: While, Value: "while"}
 			case "break":

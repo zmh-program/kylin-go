@@ -97,3 +97,52 @@ func (i *Interpreter) WhileCall() interface{} {
 	}
 	return nil
 }
+
+func (i *Interpreter) ForCall() interface{} {
+	if i.Peek().Type != Identifier {
+		log.Fatalln("For must have a identifier")
+	}
+	param := i.Next().Value
+
+	if i.Peek().Type != In {
+		log.Fatalln("For must have in keyword")
+	}
+	i.Skip()
+
+	array := i.ExprNext().([]interface{})
+
+	if i.Peek().Type != LeftBrace {
+		log.Fatalln("For must have a left brace")
+	}
+
+	i.Skip()
+
+	idx := 0
+	cursor := i.lexer.cursor
+
+	for {
+		i.SetVariable(param, array[idx])
+		idx++
+		if idx >= len(array) {
+			break
+		}
+
+		for {
+			if i.IsEnd() {
+				log.Fatalln("For not closed")
+			}
+			if i.Peek().Type == RightBrace {
+				i.Skip()
+				break
+			}
+			i.ExprNext()
+			if i.Peek().Type == Comma {
+				i.Skip()
+			}
+		}
+
+		i.lexer.cursor = cursor
+	}
+
+	return nil
+}

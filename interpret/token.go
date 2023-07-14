@@ -22,6 +22,7 @@ const (
 	Elif
 	Else
 	For
+	In
 	While
 	Break
 	Continue

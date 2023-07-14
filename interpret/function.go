@@ -31,7 +31,7 @@ func (i *Interpreter) ReadFunctionName() string {
 	name := ""
 	for {
 		if i.IsEnd() {
-			panic("Function not closed")
+			i.Throw("SyntaxError", "Function name not closed")
 		}
 		if i.Peek().Type == LeftParenthesis {
 			break
@@ -45,12 +45,12 @@ func (i *Interpreter) ReadFunctionName() string {
 func (i *Interpreter) ReadFunctionParams() []string {
 	params := make([]string, 0)
 	if i.Peek().Type != LeftParenthesis {
-		panic("Function must be followed by parenthesis")
+		i.Throw("SyntaxError", "Function params must start with '('")
 	}
 	i.Skip()
 	for {
 		if i.IsEnd() {
-			panic("Function not closed")
+			i.Throw("SyntaxError", "Function params not closed")
 		}
 		if i.Peek().Type == RightParenthesis {
 			i.Skip()
@@ -58,7 +58,7 @@ func (i *Interpreter) ReadFunctionParams() []string {
 		}
 		param := i.Peek()
 		if param.Type != Identifier {
-			panic("Function param must be identifier")
+			i.Throw("SyntaxError", "Function params must be identifier")
 		}
 		i.Skip()
 		params = append(params, param.Value)
@@ -75,7 +75,7 @@ func (i *Interpreter) ReadFunctionBody() string {
 	for {
 		i.lexer.NextCursor()
 		if i.IsEnd() {
-			panic("Function body not closed")
+			i.Throw("SyntaxError", "Function body not closed")
 		}
 
 		if c := i.lexer.GetByte(); c == '}' {

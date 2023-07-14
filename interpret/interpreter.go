@@ -7,11 +7,13 @@ import (
 )
 
 type Interpreter struct {
-	lexer  *Lexer
-	scope  *include.Scope
-	buffer interface{}
-	ret    interface{}
-	module *module.Manager
+	lexer   *Lexer
+	scope   *include.Scope
+	buffer  interface{}
+	err     interface{}
+	ret     interface{}
+	caching bool
+	module  *module.Manager
 }
 
 func NewInterpreter(path string, parent *include.Scope) *Interpreter {
@@ -24,7 +26,11 @@ func NewInterpreter(path string, parent *include.Scope) *Interpreter {
 }
 
 func (i *Interpreter) GetVariable(name string) interface{} {
-	return i.scope.Get(name)
+	if val, ok := i.scope.Get(name); ok {
+		return val
+	}
+	i.Throw("ReferenceError", "Variable "+name+" not defined")
+	return nil
 }
 
 func (i *Interpreter) SetVariable(name string, value interface{}) {

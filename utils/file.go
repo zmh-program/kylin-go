@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 )
@@ -21,7 +20,7 @@ func ReadKylinFile(module string) string {
 	}
 	data, err := ReadFile(module)
 	if err != nil {
-		log.Fatalln(fmt.Sprintf("File is not exist: %s", module))
+		Fatal(fmt.Sprintf("File is not exist: %s", module))
 	}
 	return data
 }

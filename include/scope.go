@@ -1,10 +1,5 @@
 package include
 
-import (
-	"fmt"
-	"log"
-)
-
 type Scope struct {
 	parent    *Scope
 	variables map[string]interface{}
@@ -17,15 +12,14 @@ func NewScope(parent *Scope) *Scope {
 	}
 }
 
-func (s *Scope) Get(name string) interface{} {
+func (s *Scope) Get(name string) (interface{}, bool) {
 	if val, ok := s.variables[name]; ok {
-		return val
+		return val, true
 	}
 	if s.parent != nil {
 		return s.parent.Get(name)
 	}
-	log.Fatalln(fmt.Sprintf("Variable '%s' not found", name))
-	return nil
+	return nil, false
 }
 
 func (s *Scope) Set(name string, value interface{}) {

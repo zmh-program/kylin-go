@@ -2,7 +2,7 @@ package interpret
 
 import (
 	"fmt"
-	"log"
+	"kylin/utils"
 )
 
 type Exception struct {
@@ -15,7 +15,7 @@ func (e *Exception) Error() string {
 }
 
 func (e *Exception) Call() interface{} {
-	log.Fatalln(e.Error())
+	utils.Fatal(e.Error())
 	return nil
 }
 
@@ -26,4 +26,38 @@ func NewException(name string, message string) *Exception {
 func Raise(name string, message string) interface{} {
 	e := NewException(name, message)
 	return e.Call()
+}
+
+func (i *Interpreter) SetException(name string, message string) {
+	i.err = NewException(name, message)
+}
+
+func (i *Interpreter) GetException() interface{} {
+	return i.err
+}
+
+func (i *Interpreter) IsException() bool {
+	return i.err != nil
+}
+
+func (i *Interpreter) ClearException() {
+	i.err = nil
+}
+
+func (i *Interpreter) IsCaching() bool {
+	return i.caching
+}
+
+func (i *Interpreter) SetCaching(caching bool) {
+	i.caching = caching
+}
+
+func (i *Interpreter) Throw(name string, message string) interface{} {
+	mes := fmt.Sprintf("%s at line %d, column %d", message, i.GetCurrentLine(), i.GetCurrentColumn())
+	if i.IsCaching() {
+		i.SetException(name, mes)
+		return nil
+	} else {
+		return Raise(name, mes)
+	}
 }

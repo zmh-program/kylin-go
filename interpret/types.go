@@ -10,7 +10,7 @@ func (i *Interpreter) ReadArray() []interface{} {
 	array := make([]interface{}, 0)
 	for {
 		if i.IsEnd() {
-			panic("Array not closed")
+			i.Throw("SyntaxError", "Array not closed")
 		}
 		if i.Peek().Type == RightBracket {
 			i.Skip()
@@ -28,7 +28,7 @@ func (i *Interpreter) ReadObject() map[string]interface{} {
 	object := make(map[string]interface{})
 	for {
 		if i.IsEnd() {
-			log.Fatalln("Object not closed")
+			i.Throw("SyntaxError", "Object not closed")
 		}
 		if i.Peek().Type == RightBrace {
 			i.Skip()
@@ -36,11 +36,11 @@ func (i *Interpreter) ReadObject() map[string]interface{} {
 		}
 		key := i.Peek()
 		if key.Type != String {
-			log.Fatalln("Object key must be string")
+			i.Throw("SyntaxError", "Object key must be string")
 		}
 		i.Skip()
 		if i.Peek().Type != Colon {
-			log.Fatalln("Object key must be followed by colon")
+			i.Throw("SyntaxError", "Object key must be string")
 		}
 		i.Skip()
 		object[key.Value] = i.ExprNext()
@@ -49,6 +49,13 @@ func (i *Interpreter) ReadObject() map[string]interface{} {
 		}
 	}
 	return object
+}
+
+func (i *Interpreter) MustGet(data interface{}, err error) interface{} {
+	if err != nil {
+		i.Throw("TypeError", err.Error())
+	}
+	return data
 }
 
 func (i *Interpreter) CountCall(token interface{}) interface{} {
@@ -60,9 +67,9 @@ func (i *Interpreter) CountCall(token interface{}) interface{} {
 		case Identifier:
 			value = i.GetVariable(token.Value)
 		case Integer:
-			value = utils.MustGet(strconv.ParseInt(token.Value, 10, 64))
+			value = i.MustGet(strconv.ParseInt(token.Value, 10, 64))
 		case Float:
-			value = utils.MustGet(strconv.ParseFloat(token.Value, 64))
+			value = i.MustGet(strconv.ParseFloat(token.Value, 64))
 		default:
 			value = token.Value
 		}

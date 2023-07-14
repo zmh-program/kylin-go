@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 )
 
 func IsLetter(n byte) bool {
@@ -23,17 +22,6 @@ func IsRegular(n byte) bool {
 
 func IsString(n byte) bool {
 	return n == '"' || n == '\''
-}
-
-func IsArray(n byte) bool {
-	return n == '[' || n == ']'
-}
-
-func MustGet[T comparable](data T, err error) T {
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("Error: %s", err))
-	}
-	return data
 }
 
 func ToString[T any](data T) string {

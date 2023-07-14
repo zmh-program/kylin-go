@@ -2,7 +2,6 @@ package interpret
 
 import (
 	"kylin/utils"
-	"log"
 )
 
 func (i *Interpreter) ConditionCall() interface{} {
@@ -11,7 +10,7 @@ func (i *Interpreter) ConditionCall() interface{} {
 		i.Skip()
 		for {
 			if i.IsEnd() {
-				log.Fatalln("Condition not closed")
+				i.Throw("SyntaxError", "Condition not closed")
 			}
 			if i.Peek().Type == RightBrace {
 				i.Skip()
@@ -29,7 +28,7 @@ func (i *Interpreter) ConditionCall() interface{} {
 		i.Skip()
 		for {
 			if i.IsEnd() {
-				log.Fatalln("Condition not closed")
+				i.Throw("SyntaxError", "Condition not closed")
 			}
 
 			if i.Peek().Type == RightBrace {
@@ -43,7 +42,7 @@ func (i *Interpreter) ConditionCall() interface{} {
 			i.Skip()
 			for {
 				if i.IsEnd() {
-					log.Fatalln("Condition not closed")
+					i.Throw("SyntaxError", "Condition not closed")
 				}
 				if i.Peek().Type == RightBrace {
 					i.Skip()
@@ -71,7 +70,7 @@ func (i *Interpreter) WhileCall() interface{} {
 		i.Skip()
 		for {
 			if i.IsEnd() {
-				log.Fatalln("While not closed")
+				i.Throw("SyntaxError", "While not closed")
 			}
 			if i.Peek().Type == RightBrace {
 				i.Skip()
@@ -98,7 +97,7 @@ func (i *Interpreter) WhileCall() interface{} {
 		i.Skip()
 		for {
 			if i.IsEnd() {
-				log.Fatalln("While not closed")
+				i.Throw("SyntaxError", "While not closed")
 			}
 
 			if i.Peek().Type == RightBrace {
@@ -113,19 +112,19 @@ func (i *Interpreter) WhileCall() interface{} {
 
 func (i *Interpreter) ForCall() interface{} {
 	if i.Peek().Type != Identifier {
-		log.Fatalln("For must have a identifier")
+		i.Throw("SyntaxError", "For must have a variable")
 	}
 	param := i.Next().Value
 
 	if i.Peek().Type != In {
-		log.Fatalln("For must have in keyword")
+		i.Throw("SyntaxError", "For must have in keyword")
 	}
 	i.Skip()
 
 	array := i.ExprNext().([]interface{})
 
 	if i.Peek().Type != LeftBrace {
-		log.Fatalln("For must have a left brace")
+		i.Throw("SyntaxError", "For must have {")
 	}
 
 	i.Skip()
@@ -141,7 +140,7 @@ func (i *Interpreter) ForCall() interface{} {
 
 		for {
 			if i.IsEnd() {
-				log.Fatalln("For not closed")
+				i.Throw("SyntaxError", "For not closed")
 			}
 			if i.Peek().Type == RightBrace {
 				i.Skip()

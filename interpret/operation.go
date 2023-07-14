@@ -40,7 +40,7 @@ func (i *Interpreter) ConditionCall() interface{} {
 			i.Skip()
 			for {
 				if i.IsEnd() {
-					panic("Condition not closed")
+					log.Fatalln("Condition not closed")
 				}
 				if i.Peek().Type == RightBrace {
 					i.Skip()
@@ -55,6 +55,44 @@ func (i *Interpreter) ConditionCall() interface{} {
 		} else if i.Peek().Type == Elif {
 			i.Skip()
 			i.ConditionCall()
+		}
+	}
+	return nil
+}
+
+func (i *Interpreter) WhileCall() interface{} {
+	cursor := i.lexer.cursor
+	condition := utils.ToBool(i.ExprNext())
+	if condition {
+		i.Skip()
+		for {
+			if i.IsEnd() {
+				log.Fatalln("While not closed")
+			}
+			if i.Peek().Type == RightBrace {
+				i.Skip()
+				break
+			}
+			i.ExprNext()
+			if i.Peek().Type == Comma {
+				i.Skip()
+			}
+		}
+
+		i.lexer.cursor = cursor
+		i.WhileCall()
+	} else {
+		i.Skip()
+		for {
+			if i.IsEnd() {
+				log.Fatalln("While not closed")
+			}
+
+			if i.Peek().Type == RightBrace {
+				i.Skip()
+				break
+			}
+			i.Skip()
 		}
 	}
 	return nil

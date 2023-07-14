@@ -99,6 +99,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return -i.ExprNext().(float64)
 	case If:
 		return i.ConditionCall()
+	case While:
+		return i.WhileCall()
 	case EOF:
 		return nil
 	}

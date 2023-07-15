@@ -21,7 +21,7 @@ func (m *Manager) Has(name string) bool {
 	return false
 }
 
-func (m *Manager) Import(name string, _interpret Interpreter) {
+func (m *Manager) Import(name string, _interpret KyRuntime) {
 	module := NewModule(name, name, _interpret)
 	module.Run()
 	m.Add(module)

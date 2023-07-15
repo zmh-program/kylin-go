@@ -2,7 +2,7 @@ package interpret
 
 import (
 	"kylin/i18n"
-	"kylin/utils"
+	"unicode"
 )
 
 const EnableDecimal = false
@@ -13,6 +13,25 @@ type Lexer struct {
 	cursor int
 	line   int
 	column int
+}
+
+func IsLetter(n rune) bool {
+	return unicode.IsLetter(n)
+}
+func IsDigit(n rune) bool {
+	return n >= '0' && n <= '9'
+}
+
+func IsRegularSymbol(n rune) bool {
+	return n == '_' || n == '$'
+}
+
+func IsRegular(n rune) bool {
+	return IsLetter(n) || IsRegularSymbol(n) || IsDigit(n)
+}
+
+func IsString(n rune) bool {
+	return n == '"' || n == '\''
 }
 
 func NewLexer(data string, i18n *i18n.Manager) *Lexer {
@@ -137,7 +156,7 @@ func (l *Lexer) Next() Token {
 		}
 		return Token{Type: LessThan, Value: "<"}
 	default:
-		if utils.IsDigit(value) {
+		if IsDigit(value) {
 			value, decimal := l.readNumber(string(value))
 			if EnableDecimal {
 				if decimal {
@@ -149,7 +168,7 @@ func (l *Lexer) Next() Token {
 				return Token{Type: Float, Value: value}
 			}
 		}
-		if utils.IsLetter(value) {
+		if IsLetter(value) {
 			identifier := l.readIdentifier(string(value))
 			identifier = l.i18n.GetKeyword(identifier)
 			switch identifier {
@@ -191,7 +210,7 @@ func (l *Lexer) Next() Token {
 				return Token{Type: Identifier, Value: identifier}
 			}
 		}
-		if utils.IsString(value) {
+		if IsString(value) {
 			return Token{Type: String, Value: l.readString()}
 		}
 	}
@@ -224,12 +243,12 @@ func (l *Lexer) readNumber(number string) (string, bool) {
 	decimal := false
 	for l.cursor < len(l.data) {
 		value := l.data[l.cursor]
-		if utils.IsDigit(value) {
+		if IsDigit(value) {
 			number += string(value)
 			l.NextCursor()
 			continue
 		}
-		if value == '.' && !decimal && utils.IsDigit(l.data[l.cursor+1]) {
+		if value == '.' && !decimal && IsDigit(l.data[l.cursor+1]) {
 			decimal = true
 			number += string(value)
 			l.NextCursor()
@@ -245,10 +264,10 @@ func (l *Lexer) readIdentifier(identifier string) string {
 	for l.cursor < len(l.data) {
 		size++
 		value := l.data[l.cursor]
-		if size == 1 && !utils.IsLetter(value) {
+		if size == 1 && !IsLetter(value) {
 			break
 		}
-		if utils.IsRegular(value) {
+		if IsRegular(value) {
 			identifier += string(value)
 			l.NextCursor()
 		} else {
@@ -262,7 +281,7 @@ func (l *Lexer) readString() string {
 	var str string
 	for l.cursor < len(l.data) {
 		value := l.data[l.cursor]
-		if utils.IsString(value) {
+		if IsString(value) {
 			l.NextCursor()
 			break
 		}

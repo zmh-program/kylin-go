@@ -1,12 +1,34 @@
 package interpret
 
 import (
-	"kylin/utils"
 	"log"
+	"math"
 	"strconv"
 )
 
-func (i *Interpreter) ReadArray() []interface{} {
+func ToBool(data interface{}) bool {
+	if data == nil {
+		return false
+	}
+	switch data.(type) {
+	case bool:
+		return data.(bool)
+	case int:
+		return data.(int) != 0
+	case float64:
+		return data.(float64) != 0
+	case string:
+		return data.(string) != ""
+	case []interface{}:
+		return len(data.([]interface{})) != 0
+	case map[string]interface{}:
+		return len(data.(map[string]interface{})) != 0
+	default:
+		return true
+	}
+}
+
+func (i *KyRuntime) ReadArray() []interface{} {
 	array := make([]interface{}, 0)
 	for {
 		if i.IsEnd() {
@@ -24,7 +46,7 @@ func (i *Interpreter) ReadArray() []interface{} {
 	return array
 }
 
-func (i *Interpreter) ReadObject() map[string]interface{} {
+func (i *KyRuntime) ReadObject() map[string]interface{} {
 	object := make(map[string]interface{})
 	for {
 		if i.IsEnd() {
@@ -51,14 +73,14 @@ func (i *Interpreter) ReadObject() map[string]interface{} {
 	return object
 }
 
-func (i *Interpreter) MustGet(data interface{}, err error) interface{} {
+func (i *KyRuntime) MustGet(data interface{}, err error) interface{} {
 	if err != nil {
 		i.Throw("TypeError", err.Error())
 	}
 	return data
 }
 
-func (i *Interpreter) CountCall(token interface{}) interface{} {
+func (i *KyRuntime) CountCall(token interface{}) interface{} {
 	var value interface{}
 	switch (token).(type) {
 	case *Token:
@@ -96,13 +118,13 @@ func (i *Interpreter) CountCall(token interface{}) interface{} {
 		return float64(int64(value.(float64)) % int64(i.ExprNext().(float64)))
 	case Exponent:
 		i.Skip()
-		return utils.Pow(value.(float64), i.ExprNext().(float64))
+		return math.Pow(value.(float64), i.ExprNext().(float64))
 	case And:
 		i.Skip()
-		return utils.ToBool(value) && utils.ToBool(i.ExprNext())
+		return ToBool(value) && ToBool(i.ExprNext())
 	case Or:
 		i.Skip()
-		return utils.ToBool(value) || utils.ToBool(i.ExprNext())
+		return ToBool(value) || ToBool(i.ExprNext())
 	case IsEquals:
 		i.Skip()
 		return value == i.ExprNext()
@@ -126,7 +148,7 @@ func (i *Interpreter) CountCall(token interface{}) interface{} {
 	}
 }
 
-func (i *Interpreter) ParenthesisCall() []interface{} {
+func (i *KyRuntime) ParenthesisCall() []interface{} {
 	i.Skip()
 
 	buffer := make([]interface{}, 0)
@@ -144,7 +166,7 @@ func (i *Interpreter) ParenthesisCall() []interface{} {
 	return buffer
 }
 
-func (i *Interpreter) AssignCall(token *Token) bool {
+func (i *KyRuntime) AssignCall(token *Token) bool {
 	if token.Type != Identifier {
 		return false
 	}
@@ -181,7 +203,7 @@ func (i *Interpreter) AssignCall(token *Token) bool {
 		return true
 	case ExponentEquals:
 		i.Skip()
-		i.SetVariable(token.Value, utils.Pow(i.GetVariable(token.Value).(float64), i.ExprNext().(float64)))
+		i.SetVariable(token.Value, math.Pow(i.GetVariable(token.Value).(float64), i.ExprNext().(float64)))
 		return true
 	default:
 		return false

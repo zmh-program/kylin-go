@@ -1,11 +1,7 @@
 package interpret
 
-import (
-	"kylin/utils"
-)
-
-func (i *Interpreter) ConditionCall() interface{} {
-	condition := utils.ToBool(i.ExprNext())
+func (i *KyRuntime) ConditionCall() interface{} {
+	condition := ToBool(i.ExprNext())
 	if condition {
 		i.Skip()
 		for {
@@ -62,10 +58,10 @@ func (i *Interpreter) ConditionCall() interface{} {
 	return nil
 }
 
-func (i *Interpreter) WhileCall() interface{} {
+func (i *KyRuntime) WhileCall() interface{} {
 	cursor := i.lexer.cursor
 	line := i.lexer.line
-	condition := utils.ToBool(i.ExprNext())
+	condition := ToBool(i.ExprNext())
 
 	if condition {
 		i.Skip()
@@ -112,7 +108,7 @@ func (i *Interpreter) WhileCall() interface{} {
 	return nil
 }
 
-func (i *Interpreter) ForCall() interface{} {
+func (i *KyRuntime) ForCall() interface{} {
 	if i.Peek().Type != Identifier {
 		i.Throw("SyntaxError", "For must have a variable")
 	}

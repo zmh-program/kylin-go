@@ -15,7 +15,7 @@ func main() {
 		file = os.Args[1]
 	}
 
-	runtime := interpret.NewInterpreter(
+	runtime := interpret.NewRuntime(
 		file,
 		include.NewGlobalScope(),
 		i18n.NewManager(),

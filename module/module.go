@@ -5,25 +5,25 @@ import (
 )
 
 type Module struct {
-	name        string
-	path        string
-	interpreter Interpreter
+	name    string
+	path    string
+	runtime KyRuntime
 }
 
-func NewModule(name string, path string, _interpret Interpreter) *Module {
+func NewModule(name string, path string, runtime KyRuntime) *Module {
 	return &Module{
-		name:        name,
-		path:        path,
-		interpreter: _interpret,
+		name:    name,
+		path:    path,
+		runtime: runtime,
 	}
 }
 
 func (m *Module) Run() {
-	m.interpreter.Run()
+	m.runtime.Run()
 }
 
-func (m *Module) GetInterpreter() Interpreter {
-	return m.interpreter
+func (m *Module) GetRuntime() KyRuntime {
+	return m.runtime
 }
 
 func (m *Module) GetName() string {
@@ -35,9 +35,9 @@ func (m *Module) GetPath() string {
 }
 
 func (m *Module) GetScope() *include.Scope {
-	return m.interpreter.GetScope()
+	return m.runtime.GetScope()
 }
 
 func (m *Module) SetScope(scope *include.Scope) {
-	m.interpreter.SetScope(scope)
+	m.runtime.SetScope(scope)
 }

@@ -1,6 +1,6 @@
 package interpret
 
-func (i *Interpreter) UseCall() interface{} {
+func (i *KyRuntime) UseCall() interface{} {
 	if token := i.Peek(); token.Type == String {
 		lang := token.Value
 

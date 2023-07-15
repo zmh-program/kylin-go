@@ -4,31 +4,31 @@ import (
 	"kylin/include"
 )
 
-func (i *Interpreter) SetException(name string, message string, line int, column int) {
+func (i *KyRuntime) SetException(name string, message string, line int, column int) {
 	i.err = include.NewException(name, message, line, column)
 }
 
-func (i *Interpreter) GetException() interface{} {
+func (i *KyRuntime) GetException() interface{} {
 	return i.err
 }
 
-func (i *Interpreter) IsException() bool {
+func (i *KyRuntime) IsException() bool {
 	return i.err != nil
 }
 
-func (i *Interpreter) ClearException() {
+func (i *KyRuntime) ClearException() {
 	i.err = nil
 }
 
-func (i *Interpreter) IsCaching() bool {
+func (i *KyRuntime) IsCaching() bool {
 	return i.caching
 }
 
-func (i *Interpreter) SetCaching(caching bool) {
+func (i *KyRuntime) SetCaching(caching bool) {
 	i.caching = caching
 }
 
-func (i *Interpreter) Throw(name string, message string) interface{} {
+func (i *KyRuntime) Throw(name string, message string) interface{} {
 	if i.IsCaching() {
 		i.SetException(name, message, i.GetCurrentLine(), i.GetCurrentColumn())
 		return nil
@@ -37,11 +37,11 @@ func (i *Interpreter) Throw(name string, message string) interface{} {
 	}
 }
 
-func (i *Interpreter) ThrowError(message string) interface{} {
+func (i *KyRuntime) ThrowError(message string) interface{} {
 	return i.Throw("Error", message)
 }
 
-func (i *Interpreter) ExceptionCall() interface{} {
+func (i *KyRuntime) ExceptionCall() interface{} {
 	i.SetCaching(true)
 	defer i.SetCaching(false)
 

@@ -2,7 +2,6 @@ package include
 
 import (
 	"fmt"
-	"kylin/utils"
 	"os"
 	"os/exec"
 	"strconv"
@@ -67,8 +66,17 @@ func Sum(args ...interface{}) interface{} {
 	return sum
 }
 
+func IsTypeArray(obj interface{}) bool {
+	switch obj.(type) {
+	case []interface{}:
+		return true
+	default:
+		return false
+	}
+}
+
 func Max(args ...interface{}) interface{} {
-	if len(args) == 1 && utils.IsTypeArray(args[0]) {
+	if len(args) == 1 && IsTypeArray(args[0]) {
 		return Max(args[0].([]interface{})...)
 	}
 
@@ -89,7 +97,7 @@ func Max(args ...interface{}) interface{} {
 }
 
 func Min(args ...interface{}) interface{} {
-	if len(args) == 1 && utils.IsTypeArray(args[0]) {
+	if len(args) == 1 && IsTypeArray(args[0]) {
 		return Min(args[0].([]interface{})...)
 	}
 

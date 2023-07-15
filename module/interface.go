@@ -9,7 +9,7 @@ type Token interface {
 	GetValue() string
 }
 
-type Interpreter interface {
+type KyRuntime interface {
 	GetVariable(name string) interface{}
 	SetVariable(name string, value interface{})
 	GetScope() *include.Scope

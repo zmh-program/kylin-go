@@ -7,7 +7,7 @@ import (
 	"kylin/utils"
 )
 
-type Interpreter struct {
+type KyRuntime struct {
 	lexer   *Lexer
 	scope   *include.Scope
 	buffer  interface{}
@@ -18,9 +18,9 @@ type Interpreter struct {
 	i18n    *i18n.Manager
 }
 
-func NewInterpreter(path string, parent *include.Scope, i18n *i18n.Manager) *Interpreter {
+func NewRuntime(path string, parent *include.Scope, i18n *i18n.Manager) *KyRuntime {
 	data := utils.ReadKylinFile(path)
-	return &Interpreter{
+	return &KyRuntime{
 		lexer:  NewLexer(data, i18n),
 		scope:  include.NewScope(parent),
 		module: module.NewManager(),
@@ -28,7 +28,7 @@ func NewInterpreter(path string, parent *include.Scope, i18n *i18n.Manager) *Int
 	}
 }
 
-func (i *Interpreter) GetVariable(name string) interface{} {
+func (i *KyRuntime) GetVariable(name string) interface{} {
 	if val, ok := i.scope.Get(name); ok {
 		return val
 	}
@@ -36,59 +36,59 @@ func (i *Interpreter) GetVariable(name string) interface{} {
 	return nil
 }
 
-func (i *Interpreter) SetVariable(name string, value interface{}) {
+func (i *KyRuntime) SetVariable(name string, value interface{}) {
 	i.scope.Set(name, value)
 }
 
-func (i *Interpreter) GetScope() *include.Scope {
+func (i *KyRuntime) GetScope() *include.Scope {
 	return i.scope
 }
 
-func (i *Interpreter) SetScope(scope *include.Scope) {
+func (i *KyRuntime) SetScope(scope *include.Scope) {
 	i.scope = scope
 }
 
-func (i *Interpreter) GetModule() *module.Manager {
+func (i *KyRuntime) GetModule() *module.Manager {
 	return i.module
 }
 
-func (i *Interpreter) SetModule(module *module.Manager) {
+func (i *KyRuntime) SetModule(module *module.Manager) {
 	i.module = module
 }
 
-func (i *Interpreter) GetI18n() *i18n.Manager {
+func (i *KyRuntime) GetI18n() *i18n.Manager {
 	return i.i18n
 }
 
-func (i *Interpreter) SetI18n(i18n *i18n.Manager) {
+func (i *KyRuntime) SetI18n(i18n *i18n.Manager) {
 	i.i18n = i18n
 }
 
-func (i *Interpreter) Next() Token {
+func (i *KyRuntime) Next() Token {
 	return i.lexer.Next()
 }
 
-func (i *Interpreter) Peek() Token {
+func (i *KyRuntime) Peek() Token {
 	return i.lexer.Peek()
 }
 
-func (i *Interpreter) Skip() {
+func (i *KyRuntime) Skip() {
 	i.lexer.Skip()
 }
 
-func (i *Interpreter) GetCurrentLine() int {
+func (i *KyRuntime) GetCurrentLine() int {
 	return i.lexer.line
 }
 
-func (i *Interpreter) GetCurrentColumn() int {
+func (i *KyRuntime) GetCurrentColumn() int {
 	return i.lexer.column
 }
 
-func (i *Interpreter) GetNextPtr() *Token {
+func (i *KyRuntime) GetNextPtr() *Token {
 	return i.lexer.GetNextPtr()
 }
 
-func (i *Interpreter) Expr(token *Token) interface{} {
+func (i *KyRuntime) Expr(token *Token) interface{} {
 	switch token.Type {
 	case Integer:
 		return i.CountCall(token)
@@ -138,34 +138,34 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 	return token
 }
 
-func (i *Interpreter) GetBuffer() interface{} {
+func (i *KyRuntime) GetBuffer() interface{} {
 	return i.buffer
 }
 
-func (i *Interpreter) SetBuffer(token interface{}) {
+func (i *KyRuntime) SetBuffer(token interface{}) {
 	i.buffer = token
 }
 
-func (i *Interpreter) GetReturn() interface{} {
+func (i *KyRuntime) GetReturn() interface{} {
 	return i.ret
 }
 
-func (i *Interpreter) SetReturn(token interface{}) interface{} {
+func (i *KyRuntime) SetReturn(token interface{}) interface{} {
 	i.ret = token
 	return token
 }
 
-func (i *Interpreter) IsEnd() bool {
+func (i *KyRuntime) IsEnd() bool {
 	return i.lexer.IsEnd()
 }
 
-func (i *Interpreter) ExprNext() interface{} {
+func (i *KyRuntime) ExprNext() interface{} {
 	res := i.Expr(i.GetNextPtr())
 	i.SetBuffer(res)
 	return res
 }
 
-func (i *Interpreter) Run() interface{} {
+func (i *KyRuntime) Run() interface{} {
 	for !i.IsEnd() {
 		i.ExprNext()
 	}

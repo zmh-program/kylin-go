@@ -4,7 +4,7 @@ import (
 	"kylin/i18n"
 	"kylin/include"
 	"kylin/module"
-	"kylin/utils"
+	"reflect"
 )
 
 type KyFunction struct {
@@ -15,7 +15,7 @@ type KyFunction struct {
 
 func (k *KyFunction) CallWrapper(scope *include.Scope, i18n *i18n.Manager) interface{} {
 	return func(args ...interface{}) interface{} {
-		interpreter := &Interpreter{
+		runtime := &KyRuntime{
 			lexer:  NewLexer(k.Body, i18n),
 			scope:  include.NewScope(scope),
 			module: module.NewManager(),
@@ -23,13 +23,13 @@ func (k *KyFunction) CallWrapper(scope *include.Scope, i18n *i18n.Manager) inter
 		}
 
 		for i, param := range k.Params {
-			interpreter.SetVariable(param, args[i])
+			runtime.SetVariable(param, args[i])
 		}
-		return interpreter.Run()
+		return runtime.Run()
 	}
 }
 
-func (i *Interpreter) ReadFunctionName() string {
+func (i *KyRuntime) ReadFunctionName() string {
 	name := ""
 	for {
 		if i.IsEnd() {
@@ -44,7 +44,7 @@ func (i *Interpreter) ReadFunctionName() string {
 	return name
 }
 
-func (i *Interpreter) ReadFunctionParams() []string {
+func (i *KyRuntime) ReadFunctionParams() []string {
 	params := make([]string, 0)
 	if i.Peek().Type != LeftParenthesis {
 		i.Throw("SyntaxError", "Function params must start with '('")
@@ -71,7 +71,7 @@ func (i *Interpreter) ReadFunctionParams() []string {
 	return params
 }
 
-func (i *Interpreter) ReadFunctionBody() string {
+func (i *KyRuntime) ReadFunctionBody() string {
 	body := ""
 	i.Skip()
 	for {
@@ -90,7 +90,7 @@ func (i *Interpreter) ReadFunctionBody() string {
 	return body
 }
 
-func (i *Interpreter) ReadFunction() *KyFunction {
+func (i *KyRuntime) ReadFunction() *KyFunction {
 	function := &KyFunction{
 		Name:   i.ReadFunctionName(),
 		Params: i.ReadFunctionParams(),
@@ -103,7 +103,7 @@ func (i *Interpreter) ReadFunction() *KyFunction {
 	return function
 }
 
-func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
+func (i *KyRuntime) FunctionCall(token *Token) (bool, interface{}) {
 	if token.Type != Identifier {
 		return false, nil
 	}
@@ -135,6 +135,32 @@ func (i *Interpreter) FunctionCall(token *Token) (bool, interface{}) {
 	if i.IsException() {
 		return false, nil
 	}
-	resp := utils.CallFunc(i.GetVariable(token.Value), param)
+	resp := CallFunc(i.GetVariable(token.Value), param)
 	return true, i.CountCall(resp)
+}
+
+func CallFunc(_fn interface{}, _args []interface{}) interface{} {
+	fn := reflect.ValueOf(_fn)
+
+	args := make([]reflect.Value, len(_args))
+	for i, arg := range _args {
+		if arg == nil {
+			args[i] = reflect.ValueOf(new(interface{})).Elem()
+			continue
+		}
+		args[i] = reflect.ValueOf(arg)
+	}
+
+	resp := fn.Call(args)
+	if len(resp) == 0 {
+		return nil
+	} else if len(resp) == 1 {
+		return resp[0].Interface()
+	} else {
+		results := make([]interface{}, len(resp))
+		for i, r := range resp {
+			results[i] = r.Interface()
+		}
+		return results
+	}
 }

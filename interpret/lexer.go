@@ -7,14 +7,14 @@ import (
 const EnableDecimal = false
 
 type Lexer struct {
-	data   string
+	data   []rune
 	cursor int
 	line   int
 	column int
 }
 
 func NewLexer(data string) *Lexer {
-	return &Lexer{data: data, cursor: 0, line: 1, column: 0}
+	return &Lexer{data: []rune(data), cursor: 0, line: 1, column: 0}
 }
 
 func (l *Lexer) NextCursor() {
@@ -22,7 +22,7 @@ func (l *Lexer) NextCursor() {
 	l.column++
 }
 
-func (l *Lexer) GetByte() byte {
+func (l *Lexer) GetRune() rune {
 	return l.data[l.cursor]
 }
 

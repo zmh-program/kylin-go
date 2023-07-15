@@ -1,5 +1,6 @@
 use 'chinese'
 
-for i in range(1,10,2) {
-    输出(i)
+
+for 变量 in 范围(1,10,2) {
+    输出(变量, "hi")
 }

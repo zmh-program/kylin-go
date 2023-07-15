@@ -80,7 +80,7 @@ func (i *Interpreter) ReadFunctionBody() string {
 			i.Throw("SyntaxError", "Function body not closed")
 		}
 
-		if c := i.lexer.GetByte(); c == '}' {
+		if c := i.lexer.GetRune(); c == '}' {
 			i.lexer.NextCursor()
 			break
 		} else {

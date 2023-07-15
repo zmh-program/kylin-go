@@ -2,22 +2,22 @@ package utils
 
 import "unicode"
 
-func IsLetter(n byte) bool {
-	return unicode.IsLetter(rune(n))
+func IsLetter(n rune) bool {
+	return unicode.IsLetter(n)
 }
-func IsDigit(n byte) bool {
+func IsDigit(n rune) bool {
 	return n >= '0' && n <= '9'
 }
 
-func IsRegularSymbol(n byte) bool {
+func IsRegularSymbol(n rune) bool {
 	return n == '_' || n == '$'
 }
 
-func IsRegular(n byte) bool {
+func IsRegular(n rune) bool {
 	return IsLetter(n) || IsRegularSymbol(n) || IsDigit(n)
 }
 
-func IsString(n byte) bool {
+func IsString(n rune) bool {
 	return n == '"' || n == '\''
 }
 

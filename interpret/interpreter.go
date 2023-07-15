@@ -130,6 +130,8 @@ func (i *Interpreter) Expr(token *Token) interface{} {
 		return i.ForCall()
 	case Try:
 		return i.ExceptionCall()
+	case Use:
+		return i.UseCall()
 	case EOF:
 		return nil
 	}

@@ -1,7 +1,6 @@
 package i18n
 
 import (
-	"fmt"
 	"kylin/i18n/source"
 	"kylin/include"
 )
@@ -55,6 +54,14 @@ func (m *Manager) HasKeyword(keyword string) bool {
 	return ok
 }
 
+func (m *Manager) HasBuiltin(builtin string) bool {
+	if m.Lang == "" {
+		return false
+	}
+	_, ok := m.Sources[m.Lang].Builtin[builtin]
+	return ok
+}
+
 func (m *Manager) GetKeyword(key string) string {
 	if m.Lang == "" {
 		return key
@@ -83,7 +90,5 @@ func (m *Manager) Register(scope *include.Scope, language string) {
 		if fn, ok := scope.Get(value); ok {
 			scope.Set(key, fn)
 		}
-
-		fmt.Println(key, value)
 	}
 }

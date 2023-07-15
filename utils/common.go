@@ -1,9 +1,10 @@
 package utils
 
-func IsLetter(n byte) bool {
-	return (n >= 'a' && n <= 'z') || (n >= 'A' && n <= 'Z')
-}
+import "unicode"
 
+func IsLetter(n byte) bool {
+	return unicode.IsLetter(rune(n))
+}
 func IsDigit(n byte) bool {
 	return n >= '0' && n <= '9'
 }

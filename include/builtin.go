@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"kylin/utils"
 	"os"
+	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,6 +17,10 @@ func NewGlobalScope() *Scope {
 		scope.Set("print", Print)
 		scope.Set("input", Input)
 		scope.Set("str", String)
+		scope.Set("int", Int)
+		scope.Set("float", Float)
+		scope.Set("bool", Bool)
+		scope.Set("array", Array)
 		scope.Set("sum", Sum)
 		scope.Set("max", Max)
 		scope.Set("min", Min)
@@ -29,6 +35,9 @@ func NewGlobalScope() *Scope {
 		scope.Set("timenano", TimeNano)
 		scope.Set("sleep", Sleep)
 		scope.Set("range", Range)
+		scope.Set("read", Read)
+		scope.Set("write", Write)
+		scope.Set("shell", Shell)
 		scope.Set("exit", Exit)
 	}
 
@@ -247,4 +256,91 @@ func String(data interface{}) string {
 		return fmt.Sprintf(data.(*Exception).Repr())
 	}
 	return fmt.Sprintf("%v", data)
+}
+
+func Int(data interface{}) interface{} {
+	switch data.(type) {
+	case int:
+		return data.(int)
+	case float64:
+		return int(data.(float64))
+	case string:
+		i, err := strconv.Atoi(data.(string))
+		if err != nil {
+			return 0
+		}
+		return i
+	}
+	return 0
+}
+
+func Float(data interface{}) interface{} {
+	switch data.(type) {
+	case float64:
+		return data.(float64)
+	case int:
+		return float64(data.(int))
+	case string:
+		f, err := strconv.ParseFloat(data.(string), 64)
+		if err != nil {
+			return 0
+		}
+		return f
+	}
+	return 0
+}
+
+func Bool(data interface{}) interface{} {
+	switch data.(type) {
+	case bool:
+		return data.(bool)
+	case int:
+		return data.(int) != 0
+	case float64:
+		return data.(float64) != 0
+	case string:
+		return data.(string) != ""
+	}
+	return false
+}
+
+func Array(data interface{}) []interface{} {
+	switch data.(type) {
+	case []interface{}:
+		return data.([]interface{})
+	case string:
+		return []interface{}{data.(string)}
+	case int:
+		return []interface{}{data.(int)}
+	case float64:
+		return []interface{}{data.(float64)}
+	case bool:
+		return []interface{}{data.(bool)}
+	case nil:
+		return []interface{}{}
+	}
+	return []interface{}{}
+}
+
+func Shell(cmd interface{}) interface{} {
+	out, err := exec.Command(cmd.(string)).Output()
+	if err != nil {
+		return ""
+	}
+	return string(out)
+}
+
+func Read(filename interface{}) interface{} {
+	data, err := os.ReadFile(filename.(string))
+	if err != nil {
+		return ""
+	}
+	return string(data)
+}
+
+func Write(filename interface{}, data interface{}) {
+	content := []byte(String(data))
+	if err := os.WriteFile(filename.(string), content, 0644); err != nil {
+		panic(err)
+	}
 }

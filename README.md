@@ -45,15 +45,12 @@ use 'chinese'
 ```
 
 > ```shell
-> 0.000000 hi
-> 报错： ReferenceError(type="ReferenceError", message="Variable 变量
-> 位置 not defined", line=7, column=15)
-> 1.000000 hi
-> 报错： ReferenceError(type="ReferenceError", message="Variable 变量
-> 位置 not defined", line=7, column=15)
-> 2.000000 hi
-> 报错： ReferenceError(type="ReferenceError", message="Variable 变量
-> 位置 not defined", line=7, column=15)
+> 0 hi
+> 报错： ReferenceError(type="ReferenceError", message="Variable 变量位置 not defined", line=7, column=15)
+> 1 hi
+> 报错： ReferenceError(type="ReferenceError", message="Variable 变量位置 not defined", line=7, column=15)
+> 2 hi
+> 报错： ReferenceError(type="ReferenceError", message="Variable 变量位置 not defined", line=7, column=15)
 > ```
 
 ## 语言规范
@@ -185,6 +182,10 @@ kylin main.ky
 - `print` 打印
 - `input` 输入
 - `str` 字符串
+- `int` 整数
+- `float` 浮点数
+- `bool` 布尔值
+- `array` 数组
 - `range` 范围
 - `len` 长度
 - `sum` 求和
@@ -199,6 +200,9 @@ kylin main.ky
 - `time` 时间 (ms)
 - `sleep` 阻塞等待 (ms)
 - `timenano` CPU 时间 (ns)
+- `read` 读取文件
+- `write` 写入文件
+- `shell` 执行 shell 命令
 - `exit` 退出程序
 
 ## 语言设计

@@ -19,6 +19,10 @@ Kylin Go,  一款基于 Golang 的跨平台简洁高效轻量的编程语言
 - 🎃 跨平台编译
 - 🎈 国际化支持 （英，中文）
 
+## [发行版](https://github.com/zmh-program/kylin-go/releases)
+- [x] Windows
+- [x] Linux Ubuntu
+- [x] MacOS
 
 ## 语言示例
 

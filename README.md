@@ -249,10 +249,10 @@ while n < 1000000 {
 ```
 1. C (GCC) `0.9 MB`
 2. Golang `3.2 MB`
-3. **Kylin Go** `6 MB`
+3. **Kylin Go** `8 MB`
 4. Node `10 MB`
 5. Python `14MB`
-6. Kylin JVM `80MB`
+6. Kylin JVM `84MB`
 
 #### 内存溢出测试
 1. C ❌
@@ -298,6 +298,14 @@ n = 0
 while n < 1000000 {
     n += 1
     print('hello world')
+}
+```
+**Kylin JVM**
+```kylin
+var n = 0
+while n < 1000000 {
+    n = <n + 1>
+    out('hello world')
 }
 ```
 NodeJS

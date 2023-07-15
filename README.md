@@ -13,10 +13,11 @@ Kylin Go,  一款基于 Golang 的跨平台简洁高效轻量的编程语言
 </div>
 
 ## 语言特性
-- 语法简单，易学易用
-- 语法高效，编译速度快
-- 内存占用小
-- 跨平台编译
+- ✨ 语法简单，易学易用
+- ⚡ 语法高效，编译速度快
+- 📦 内存占用小
+- 🎃 跨平台编译
+- 🎈 国际化支持 （英，中文）
 
 
 ## 语言示例
@@ -215,3 +216,102 @@ kylin main.ky
 
 #### 3. 语言编译
 - 编译器使用 Golang SSA 进行编译
+
+
+## 基准测试
+
+#### 性能测试
+```kylin
+n = 0
+val = 2345
+t = time()
+while n < 9999999 {
+    n += 1
+    val **= 1289
+    val = n * 999
+}
+
+print(time() - t, "ms")
+```
+1. C (GCC) `891.9ms`
+2. Golang `1012.5ms`
+3. NodeJS `1170.0ms`
+4. **Kylin Go** `1751.2ms`
+5. Python `4681.8ms`
+
+#### 内存占用 （整体）
+```kylin
+n = 0
+while n < 1000000 {
+    n += 1
+    print('hello world')
+}
+```
+1. C (GCC) `0.9 MB`
+2. Golang `3.2 MB`
+3. **Kylin Go** `6 MB`
+4. Node `10 MB`
+5. Python `14MB`
+6. Kylin JVM `80MB`
+
+#### 内存溢出测试
+1. C ❌
+2. Golang ❌
+3. **Kylin Go** ❌
+4. NodeJS ❌
+5. Python ❌
+6. Kylin JVM ✔
+
+#### 风格对比
+C 语言
+```c
+#include <stdio.h>
+
+int main() {
+    int n = 0;
+    
+    while (n < 1000000) {
+        n++;
+        printf("hello world\n");
+    }
+    
+    return 0;
+}
+```
+Golang 
+```go
+package main
+
+import "fmt"
+
+func main() {
+	n := 0
+	for n < 1000000 {
+		n++
+		fmt.Println("hello world")
+	}
+}
+```
+**Kylin Go**
+```kylin
+n = 0
+while n < 1000000 {
+    n += 1
+    print('hello world')
+}
+```
+NodeJS
+```js
+let n = 0;
+while (n < 1000000) {
+    n++;
+    console.log('hello world');
+}
+```
+Python
+```python
+n = 0
+while n < 1000000:
+    n += 1
+    print('hello world')
+```

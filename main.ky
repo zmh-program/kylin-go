@@ -1,5 +1,10 @@
-use 'chinese'
-
-while true {
-    print('hello world')
+n = 0
+val = 2345
+t = time()
+while n < 999999 {
+    n += 1
+    val **= 128
+    val = n * 999
 }
+
+print(time() - t, "ms")

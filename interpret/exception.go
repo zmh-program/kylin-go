@@ -2,6 +2,7 @@ package interpret
 
 import (
 	"kylin/include"
+	"kylin/lexer"
 )
 
 func (i *KyRuntime) SetException(name string, message string, line int, column int) {
@@ -45,7 +46,7 @@ func (i *KyRuntime) ExceptionCall() interface{} {
 	i.SetCaching(true)
 	defer i.SetCaching(false)
 
-	if i.Peek().Type != LeftBrace {
+	if i.Peek().Type != lexer.LeftBrace {
 		i.Throw("SyntaxError", "Exception must have {")
 	}
 	i.Skip()
@@ -54,19 +55,19 @@ func (i *KyRuntime) ExceptionCall() interface{} {
 		if i.IsEnd() {
 			i.Throw("SyntaxError", "Exception not closed")
 		}
-		if i.Peek().Type == RightBrace {
+		if i.Peek().Type == lexer.RightBrace {
 			i.Skip()
 			break
 		}
-		if i.Peek().Type == Break {
+		if i.Peek().Type == lexer.Break {
 			return nil
-		} else if i.Peek().Type == Continue {
+		} else if i.Peek().Type == lexer.Continue {
 			i.Skip()
 			break
 		}
 
 		i.ExprNext()
-		if i.Peek().Type == Comma {
+		if i.Peek().Type == lexer.Comma {
 			i.Skip()
 		}
 		if i.IsException() {
@@ -74,19 +75,19 @@ func (i *KyRuntime) ExceptionCall() interface{} {
 				if i.IsEnd() {
 					i.Throw("SyntaxError", "Exception not closed")
 				}
-				if i.Peek().Type == RightBrace {
+				if i.Peek().Type == lexer.RightBrace {
 					i.Skip()
 					break
 				}
-				if i.Peek().Type == Break {
+				if i.Peek().Type == lexer.Break {
 					return nil
-				} else if i.Peek().Type == Continue {
+				} else if i.Peek().Type == lexer.Continue {
 					i.Skip()
 					break
 				}
 
 				i.ExprNext()
-				if i.Peek().Type == Comma {
+				if i.Peek().Type == lexer.Comma {
 					i.Skip()
 				}
 			}
@@ -97,10 +98,10 @@ func (i *KyRuntime) ExceptionCall() interface{} {
 	i.SetVariable("error", i.GetException())
 	i.ClearException()
 
-	if i.Peek().Type == Catch {
+	if i.Peek().Type == lexer.Catch {
 		i.Skip()
 
-		if i.Peek().Type != LeftBrace {
+		if i.Peek().Type != lexer.LeftBrace {
 			i.Throw("SyntaxError", "Catch must have {")
 		}
 		i.Skip()
@@ -109,19 +110,19 @@ func (i *KyRuntime) ExceptionCall() interface{} {
 			if i.IsEnd() {
 				i.Throw("SyntaxError", "Catch not closed")
 			}
-			if i.Peek().Type == RightBrace {
+			if i.Peek().Type == lexer.RightBrace {
 				i.Skip()
 				break
 			}
-			if i.Peek().Type == Break {
+			if i.Peek().Type == lexer.Break {
 				return nil
-			} else if i.Peek().Type == Continue {
+			} else if i.Peek().Type == lexer.Continue {
 				i.Skip()
 				break
 			}
 
 			i.ExprNext()
-			if i.Peek().Type == Comma {
+			if i.Peek().Type == lexer.Comma {
 				i.Skip()
 			}
 		}

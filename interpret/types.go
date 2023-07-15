@@ -1,6 +1,7 @@
 package interpret
 
 import (
+	"kylin/lexer"
 	"log"
 	"math"
 	"strconv"
@@ -34,12 +35,12 @@ func (i *KyRuntime) ReadArray() []interface{} {
 		if i.IsEnd() {
 			i.Throw("SyntaxError", "Array not closed")
 		}
-		if i.Peek().Type == RightBracket {
+		if i.Peek().Type == lexer.RightBracket {
 			i.Skip()
 			break
 		}
 		array = append(array, i.ExprNext())
-		if i.Peek().Type == Comma {
+		if i.Peek().Type == lexer.Comma {
 			i.Skip()
 		}
 	}
@@ -52,21 +53,21 @@ func (i *KyRuntime) ReadObject() map[string]interface{} {
 		if i.IsEnd() {
 			i.Throw("SyntaxError", "Object not closed")
 		}
-		if i.Peek().Type == RightBrace {
+		if i.Peek().Type == lexer.RightBrace {
 			i.Skip()
 			break
 		}
 		key := i.Peek()
-		if key.Type != String {
+		if key.Type != lexer.String {
 			i.Throw("SyntaxError", "Object key must be string")
 		}
 		i.Skip()
-		if i.Peek().Type != Colon {
+		if i.Peek().Type != lexer.Colon {
 			i.Throw("SyntaxError", "Object key must be string")
 		}
 		i.Skip()
 		object[key.Value] = i.ExprNext()
-		if i.Peek().Type == Comma {
+		if i.Peek().Type == lexer.Comma {
 			i.Skip()
 		}
 	}
@@ -83,14 +84,14 @@ func (i *KyRuntime) MustGet(data interface{}, err error) interface{} {
 func (i *KyRuntime) CountCall(token interface{}) interface{} {
 	var value interface{}
 	switch (token).(type) {
-	case *Token:
-		token := token.(*Token)
+	case *lexer.Token:
+		token := token.(*lexer.Token)
 		switch token.Type {
-		case Identifier:
+		case lexer.Identifier:
 			value = i.GetVariable(token.Value)
-		case Integer:
+		case lexer.Integer:
 			value = i.MustGet(strconv.ParseInt(token.Value, 10, 64))
-		case Float:
+		case lexer.Float:
 			value = i.MustGet(strconv.ParseFloat(token.Value, 64))
 		default:
 			value = token.Value
@@ -101,46 +102,46 @@ func (i *KyRuntime) CountCall(token interface{}) interface{} {
 
 	peek := i.Peek()
 	switch peek.Type {
-	case Addition:
+	case lexer.Addition:
 		i.Skip()
 		return value.(float64) + i.ExprNext().(float64)
-	case Subtraction:
+	case lexer.Subtraction:
 		i.Skip()
 		return value.(float64) - i.ExprNext().(float64)
-	case Multiplication:
+	case lexer.Multiplication:
 		i.Skip()
 		return value.(float64) * i.ExprNext().(float64)
-	case Division:
+	case lexer.Division:
 		i.Skip()
 		return value.(float64) / i.ExprNext().(float64)
-	case Modulo:
+	case lexer.Modulo:
 		i.Skip()
 		return float64(int64(value.(float64)) % int64(i.ExprNext().(float64)))
-	case Exponent:
+	case lexer.Exponent:
 		i.Skip()
 		return math.Pow(value.(float64), i.ExprNext().(float64))
-	case And:
+	case lexer.And:
 		i.Skip()
 		return ToBool(value) && ToBool(i.ExprNext())
-	case Or:
+	case lexer.Or:
 		i.Skip()
 		return ToBool(value) || ToBool(i.ExprNext())
-	case IsEquals:
+	case lexer.IsEquals:
 		i.Skip()
 		return value == i.ExprNext()
-	case NotEquals:
+	case lexer.NotEquals:
 		i.Skip()
 		return value != i.ExprNext()
-	case GreaterThan:
+	case lexer.GreaterThan:
 		i.Skip()
 		return value.(float64) > i.ExprNext().(float64)
-	case LessThan:
+	case lexer.LessThan:
 		i.Skip()
 		return value.(float64) < i.ExprNext().(float64)
-	case GreaterThanOrEqual:
+	case lexer.GreaterThanOrEqual:
 		i.Skip()
 		return value.(float64) >= i.ExprNext().(float64)
-	case LessThanOrEqual:
+	case lexer.LessThanOrEqual:
 		i.Skip()
 		return value.(float64) <= i.ExprNext().(float64)
 	default:
@@ -156,7 +157,7 @@ func (i *KyRuntime) ParenthesisCall() []interface{} {
 		if i.IsEnd() {
 			log.Fatal("Unexpected end of file")
 		}
-		if i.Peek().Type == RightParenthesis {
+		if i.Peek().Type == lexer.RightParenthesis {
 			i.Skip()
 			break
 		}
@@ -166,8 +167,8 @@ func (i *KyRuntime) ParenthesisCall() []interface{} {
 	return buffer
 }
 
-func (i *KyRuntime) AssignCall(token *Token) bool {
-	if token.Type != Identifier {
+func (i *KyRuntime) AssignCall(token *lexer.Token) bool {
+	if token.Type != lexer.Identifier {
 		return false
 	}
 	if i.IsEnd() {
@@ -176,32 +177,32 @@ func (i *KyRuntime) AssignCall(token *Token) bool {
 
 	peek := i.Peek()
 	switch peek.Type {
-	case Equals:
+	case lexer.Equals:
 		i.Skip()
 		r := i.ExprNext()
 		i.SetVariable(token.Value, r)
 		return true
-	case PlusEquals:
+	case lexer.PlusEquals:
 		i.Skip()
 		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)+i.ExprNext().(float64))
 		return true
-	case MinusEquals:
+	case lexer.MinusEquals:
 		i.Skip()
 		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)-i.ExprNext().(float64))
 		return true
-	case TimesEquals:
+	case lexer.TimesEquals:
 		i.Skip()
 		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)*i.ExprNext().(float64))
 		return true
-	case DividedEquals:
+	case lexer.DividedEquals:
 		i.Skip()
 		i.SetVariable(token.Value, i.GetVariable(token.Value).(float64)/i.ExprNext().(float64))
 		return true
-	case ModuloEquals:
+	case lexer.ModuloEquals:
 		i.Skip()
 		i.SetVariable(token.Value, float64(int64(i.GetVariable(token.Value).(float64))%int64(i.ExprNext().(float64))))
 		return true
-	case ExponentEquals:
+	case lexer.ExponentEquals:
 		i.Skip()
 		i.SetVariable(token.Value, math.Pow(i.GetVariable(token.Value).(float64), i.ExprNext().(float64)))
 		return true

@@ -3,12 +3,13 @@ package interpret
 import (
 	"kylin/i18n"
 	"kylin/include"
+	"kylin/lexer"
 	"kylin/lib"
 	"kylin/module"
 )
 
 type KyRuntime struct {
-	lexer   *Lexer
+	lexer   *lexer.Lexer
 	scope   *include.Scope
 	buffer  interface{}
 	err     interface{}
@@ -21,7 +22,7 @@ type KyRuntime struct {
 func NewRuntime(path string, parent *include.Scope, i18n *i18n.Manager) *KyRuntime {
 	data := lib.ReadKylinFile(path)
 	return &KyRuntime{
-		lexer:  NewLexer(data, i18n),
+		lexer:  lexer.NewLexer(data, i18n),
 		scope:  include.NewScope(parent),
 		module: module.NewManager(),
 		i18n:   i18n,
@@ -64,11 +65,11 @@ func (i *KyRuntime) SetI18n(i18n *i18n.Manager) {
 	i.i18n = i18n
 }
 
-func (i *KyRuntime) Next() Token {
+func (i *KyRuntime) Next() lexer.Token {
 	return i.lexer.Next()
 }
 
-func (i *KyRuntime) Peek() Token {
+func (i *KyRuntime) Peek() lexer.Token {
 	return i.lexer.Peek()
 }
 
@@ -77,32 +78,32 @@ func (i *KyRuntime) Skip() {
 }
 
 func (i *KyRuntime) GetCurrentLine() int {
-	return i.lexer.line
+	return i.lexer.Line
 }
 
 func (i *KyRuntime) GetCurrentColumn() int {
-	return i.lexer.column
+	return i.lexer.Column
 }
 
-func (i *KyRuntime) GetNextPtr() *Token {
+func (i *KyRuntime) GetNextPtr() *lexer.Token {
 	return i.lexer.GetNextPtr()
 }
 
-func (i *KyRuntime) Expr(token *Token) interface{} {
+func (i *KyRuntime) Expr(token *lexer.Token) interface{} {
 	switch token.Type {
-	case Integer:
+	case lexer.Integer:
 		return i.CountCall(token)
-	case Float:
+	case lexer.Float:
 		return i.CountCall(token)
-	case True:
+	case lexer.True:
 		return true
-	case False:
+	case lexer.False:
 		return false
-	case Null:
+	case lexer.Null:
 		return nil
-	case String:
+	case lexer.String:
 		return token.Value
-	case Identifier:
+	case lexer.Identifier:
 		if i.AssignCall(token) {
 			return nil
 		}
@@ -110,29 +111,29 @@ func (i *KyRuntime) Expr(token *Token) interface{} {
 			return resp
 		}
 		return i.CountCall(token)
-	case LeftParenthesis:
+	case lexer.LeftParenthesis:
 		return i.ParenthesisCall()
-	case LeftBracket:
+	case lexer.LeftBracket:
 		return i.ReadArray()
-	case LeftBrace:
+	case lexer.LeftBrace:
 		return i.ReadObject()
-	case Function:
+	case lexer.Function:
 		return i.ReadFunction()
-	case Return:
+	case lexer.Return:
 		return i.SetReturn(i.ExprNext())
-	case Subtraction:
+	case lexer.Subtraction:
 		return -i.ExprNext().(float64)
-	case If:
+	case lexer.If:
 		return i.ConditionCall()
-	case While:
+	case lexer.While:
 		return i.WhileCall()
-	case For:
+	case lexer.For:
 		return i.ForCall()
-	case Try:
+	case lexer.Try:
 		return i.ExceptionCall()
-	case Use:
+	case lexer.Use:
 		return i.UseCall()
-	case EOF:
+	case lexer.EOF:
 		return nil
 	}
 	return token

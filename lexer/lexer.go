@@ -1,4 +1,4 @@
-package interpret
+package lexer
 
 import (
 	"kylin/i18n"
@@ -10,9 +10,9 @@ const EnableDecimal = false
 type Lexer struct {
 	data   []rune
 	i18n   *i18n.Manager
-	cursor int
-	line   int
-	column int
+	Cursor int
+	Line   int
+	Column int
 }
 
 func IsLetter(n rune) bool {
@@ -35,23 +35,23 @@ func IsString(n rune) bool {
 }
 
 func NewLexer(data string, i18n *i18n.Manager) *Lexer {
-	return &Lexer{data: []rune(data), cursor: 0, line: 1, column: 0, i18n: i18n}
+	return &Lexer{data: []rune(data), Cursor: 0, Line: 1, Column: 0, i18n: i18n}
 }
 
 func (l *Lexer) NextCursor() {
-	l.cursor++
-	l.column++
+	l.Cursor++
+	l.Column++
 }
 
 func (l *Lexer) GetRune() rune {
-	return l.data[l.cursor]
+	return l.data[l.Cursor]
 }
 
 func (l *Lexer) Next() Token {
-	if l.cursor >= len(l.data) {
+	if l.Cursor >= len(l.data) {
 		return Token{Type: EOF}
 	}
-	value := l.data[l.cursor]
+	value := l.data[l.Cursor]
 	l.NextCursor()
 	switch value {
 	case '+':
@@ -127,8 +127,8 @@ func (l *Lexer) Next() Token {
 	case ';', '\r', '\t':
 		return Token{Type: Sep}
 	case '\n':
-		l.line++
-		l.column = 0
+		l.Line++
+		l.Column = 0
 		return Token{Type: Sep}
 	case '>':
 		if l.GetNext('=') {
@@ -171,9 +171,9 @@ func (l *Lexer) Next() Token {
 }
 
 func (l *Lexer) Peek() Token {
-	cursor, line, column := l.cursor, l.line, l.column
+	cursor, line, column := l.Cursor, l.Line, l.Column
 	token := l.Next()
-	l.cursor, l.line, l.column = cursor, line, column
+	l.Cursor, l.Line, l.Column = cursor, line, column
 	return token
 }
 
@@ -187,11 +187,11 @@ func (l *Lexer) GetNextPtr() *Token {
 }
 
 func (l *Lexer) HasNext() bool {
-	return l.cursor < len(l.data)
+	return l.Cursor < len(l.data)
 }
 
 func (l *Lexer) GetNext(token rune) bool {
-	if l.HasNext() && l.data[l.cursor] == token {
+	if l.HasNext() && l.data[l.Cursor] == token {
 		l.NextCursor()
 		return true
 	}
@@ -200,14 +200,14 @@ func (l *Lexer) GetNext(token rune) bool {
 
 func (l *Lexer) readNumber(number string) (string, bool) {
 	decimal := false
-	for l.cursor < len(l.data) {
-		value := l.data[l.cursor]
+	for l.Cursor < len(l.data) {
+		value := l.data[l.Cursor]
 		if IsDigit(value) {
 			number += string(value)
 			l.NextCursor()
 			continue
 		}
-		if value == '.' && !decimal && IsDigit(l.data[l.cursor+1]) {
+		if value == '.' && !decimal && IsDigit(l.data[l.Cursor+1]) {
 			decimal = true
 			number += string(value)
 			l.NextCursor()
@@ -220,9 +220,9 @@ func (l *Lexer) readNumber(number string) (string, bool) {
 
 func (l *Lexer) readIdentifier(identifier string) string {
 	var size int
-	for l.cursor < len(l.data) {
+	for l.Cursor < len(l.data) {
 		size++
-		value := l.data[l.cursor]
+		value := l.data[l.Cursor]
 		if size == 1 && !IsLetter(value) {
 			break
 		}
@@ -238,8 +238,8 @@ func (l *Lexer) readIdentifier(identifier string) string {
 
 func (l *Lexer) readString() string {
 	var str string
-	for l.cursor < len(l.data) {
-		value := l.data[l.cursor]
+	for l.Cursor < len(l.data) {
+		value := l.data[l.Cursor]
 		if IsString(value) {
 			l.NextCursor()
 			break

@@ -1,7 +1,9 @@
 package interpret
 
+import "kylin/lexer"
+
 func (i *KyRuntime) UseCall() interface{} {
-	if token := i.Peek(); token.Type == String {
+	if token := i.Peek(); token.Type == lexer.String {
 		lang := token.Value
 
 		i.i18n.Register(i.scope, lang)

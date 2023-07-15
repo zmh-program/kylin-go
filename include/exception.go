@@ -2,7 +2,7 @@ package include
 
 import (
 	"fmt"
-	"kylin/utils"
+	"kylin/lib"
 )
 
 type Exception struct {
@@ -17,7 +17,7 @@ func (e *Exception) Error() string {
 }
 
 func (e *Exception) Call() interface{} {
-	utils.Fatal(e.Error())
+	lib.Fatal(e.Error())
 	return nil
 }
 

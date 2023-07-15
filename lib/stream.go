@@ -1,4 +1,4 @@
-package utils
+package lib
 
 import (
 	"fmt"
@@ -22,5 +22,16 @@ func ReadKylinFile(module string) string {
 	if err != nil {
 		Fatal(fmt.Sprintf("File is not exist: %s", module))
 	}
+	return data
+}
+
+func Fatal(err ...interface{}) {
+	message := fmt.Sprint(err...)
+	_, _ = fmt.Fprintf(os.Stderr, message+"\n\n")
+	os.Exit(1)
+}
+
+func Debug[T comparable](data T) T {
+	fmt.Println(data)
 	return data
 }

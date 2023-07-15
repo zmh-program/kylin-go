@@ -3,8 +3,8 @@ package interpret
 import (
 	"kylin/i18n"
 	"kylin/include"
+	"kylin/lib"
 	"kylin/module"
-	"kylin/utils"
 )
 
 type KyRuntime struct {
@@ -19,7 +19,7 @@ type KyRuntime struct {
 }
 
 func NewRuntime(path string, parent *include.Scope, i18n *i18n.Manager) *KyRuntime {
-	data := utils.ReadKylinFile(path)
+	data := lib.ReadKylinFile(path)
 	return &KyRuntime{
 		lexer:  NewLexer(data, i18n),
 		scope:  include.NewScope(parent),
@@ -156,7 +156,7 @@ func (i *KyRuntime) SetReturn(token interface{}) interface{} {
 }
 
 func (i *KyRuntime) IsEnd() bool {
-	return i.lexer.IsEnd()
+	return !i.lexer.HasNext()
 }
 
 func (i *KyRuntime) ExprNext() interface{} {

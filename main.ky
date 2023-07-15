@@ -6,6 +6,11 @@ while n < 10 {
     val **= 128
     val = n * 9999
     print(val)
+    if val > 0 {
+        print("val > 0")
+    } else {
+        print("val <= 0")
+    }
 }
 
 print(time() - t, "ms")

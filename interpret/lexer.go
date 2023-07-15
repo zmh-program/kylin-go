@@ -49,112 +49,99 @@ func (l *Lexer) GetRune() rune {
 
 func (l *Lexer) Next() Token {
 	if l.cursor >= len(l.data) {
-		return Token{Type: EOF, Value: ""}
+		return Token{Type: EOF}
 	}
 	value := l.data[l.cursor]
 	l.NextCursor()
 	switch value {
 	case '+':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.NextCursor()
-			return Token{Type: PlusEquals, Value: "+="}
+		if l.GetNext('=') {
+			return Token{Type: PlusEquals}
 		}
-		return Token{Type: Addition, Value: "+"}
+		return Token{Type: Addition}
 	case '-':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.NextCursor()
-			return Token{Type: MinusEquals, Value: "-="}
+		if l.GetNext('=') {
+			return Token{Type: MinusEquals}
 		}
-		return Token{Type: Subtraction, Value: "-"}
+		return Token{Type: Subtraction}
 	case '*':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.NextCursor()
-			return Token{Type: TimesEquals, Value: "*="}
-		} else if l.cursor < len(l.data) && l.data[l.cursor] == '*' {
-			l.NextCursor()
-			if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-				l.NextCursor()
-				return Token{Type: ExponentEquals, Value: "**="}
+		if l.GetNext('=') {
+			return Token{Type: TimesEquals}
+		} else if l.GetNext('*') {
+			if l.GetNext('=') {
+				return Token{Type: ExponentEquals}
 			}
-			return Token{Type: Exponent, Value: "**"}
+			return Token{Type: Exponent}
 		}
-		return Token{Type: Multiplication, Value: "*"}
-	case '/':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.NextCursor()
-			return Token{Type: DividedEquals, Value: "/="}
-		}
-		return Token{Type: Division, Value: "/"}
-	case '%':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.NextCursor()
-			return Token{Type: ModuloEquals, Value: "%="}
-		}
-		return Token{Type: Modulo, Value: "%"}
+		return Token{Type: Multiplication}
 	case '^':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+		if l.GetNext('=') {
 			l.NextCursor()
-			return Token{Type: ExponentEquals, Value: "^="}
+			return Token{Type: ExponentEquals}
 		}
-		return Token{Type: Exponent, Value: "^"}
+		return Token{Type: Exponent}
+	case '/':
+		if l.GetNext('=') {
+			return Token{Type: DividedEquals}
+		}
+		return Token{Type: Division}
+	case '%':
+		if l.GetNext('=') {
+			return Token{Type: ModuloEquals}
+		}
+		return Token{Type: Modulo}
 	case '(':
-		return Token{Type: LeftParenthesis, Value: "("}
+		return Token{Type: LeftParenthesis}
 	case ')':
-		return Token{Type: RightParenthesis, Value: ")"}
+		return Token{Type: RightParenthesis}
 	case '[':
-		return Token{Type: LeftBracket, Value: "["}
+		return Token{Type: LeftBracket}
 	case ']':
-		return Token{Type: RightBracket, Value: "]"}
+		return Token{Type: RightBracket}
 	case '{':
-		return Token{Type: LeftBrace, Value: "{"}
+		return Token{Type: LeftBrace}
 	case '}':
-		return Token{Type: RightBrace, Value: "}"}
+		return Token{Type: RightBrace}
 	case ',':
-		return Token{Type: Comma, Value: ","}
+		return Token{Type: Comma}
 	case '.':
-		return Token{Type: Period, Value: "."}
+		return Token{Type: Period}
 	case ':':
-		return Token{Type: Colon, Value: ":"}
-	case ';':
-		return Token{Type: Semicolon, Value: ";"}
+		return Token{Type: Colon}
 	case '=':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.NextCursor()
-			return Token{Type: IsEquals, Value: "=="}
+		if l.GetNext('=') {
+			return Token{Type: IsEquals}
 		}
-		return Token{Type: Equals, Value: "="}
+		return Token{Type: Equals}
 	case '!':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
-			l.NextCursor()
-			return Token{Type: NotEquals, Value: "!="}
+		if l.GetNext('=') {
+			return Token{Type: NotEquals}
 		}
-		return Token{Type: Not, Value: "!"}
+		return Token{Type: Not}
 	case '&':
-		return Token{Type: And, Value: "&"}
+		return Token{Type: And}
 	case '|':
-		return Token{Type: Or, Value: "|"}
-	case '\r':
-		return l.Next()
+		return Token{Type: Or}
 	case ' ':
 		return l.Next()
+	case ';', '\r', '\t':
+		return Token{Type: Sep}
 	case '\n':
 		l.line++
 		l.column = 0
-		return l.Next()
-	case '\t':
-		return l.Next()
+		return Token{Type: Sep}
 	case '>':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+		if l.GetNext('=') {
 			l.NextCursor()
-			return Token{Type: GreaterThanOrEqual, Value: ">="}
+			return Token{Type: GreaterThanOrEqual}
 		}
-		return Token{Type: GreaterThan, Value: ">"}
+		return Token{Type: GreaterThan}
 	case '<':
-		if l.cursor < len(l.data) && l.data[l.cursor] == '=' {
+		if l.GetNext('=') {
 			l.NextCursor()
-			return Token{Type: LessThanOrEqual, Value: "<="}
+			return Token{Type: LessThanOrEqual}
 		}
-		return Token{Type: LessThan, Value: "<"}
+		return Token{Type: LessThan}
 	default:
 		if IsDigit(value) {
 			value, decimal := l.readNumber(string(value))
@@ -171,58 +158,22 @@ func (l *Lexer) Next() Token {
 		if IsLetter(value) {
 			identifier := l.readIdentifier(string(value))
 			identifier = l.i18n.GetKeyword(identifier)
-			switch identifier {
-			case "true":
-				return Token{Type: True, Value: "true"}
-			case "false":
-				return Token{Type: False, Value: "false"}
-			case "null":
-				return Token{Type: Null, Value: "null"}
-			case "fn":
-				return Token{Type: Function, Value: "fn"}
-			case "return":
-				return Token{Type: Return, Value: "return"}
-			case "if":
-				return Token{Type: If, Value: "if"}
-			case "elif":
-				return Token{Type: Elif, Value: "elif"}
-			case "else":
-				return Token{Type: Else, Value: "else"}
-			case "for":
-				return Token{Type: For, Value: "for"}
-			case "in":
-				return Token{Type: In, Value: "in"}
-			case "while":
-				return Token{Type: While, Value: "while"}
-			case "break":
-				return Token{Type: Break, Value: "break"}
-			case "continue":
-				return Token{Type: Continue, Value: "continue"}
-			case "import":
-				return Token{Type: Import, Value: "import"}
-			case "use":
-				return Token{Type: Use, Value: "use"}
-			case "try":
-				return Token{Type: Try, Value: "try"}
-			case "catch":
-				return Token{Type: Catch, Value: "catch"}
-			default:
-				return Token{Type: Identifier, Value: identifier}
+			if token, ok := KeywordMap[identifier]; ok {
+				return Token{Type: token}
 			}
+			return Token{Type: Identifier, Value: identifier}
 		}
 		if IsString(value) {
 			return Token{Type: String, Value: l.readString()}
 		}
 	}
-	return Token{Type: EOF, Value: ""}
+	return Token{Type: EOF}
 }
 
 func (l *Lexer) Peek() Token {
 	cursor, line, column := l.cursor, l.line, l.column
 	token := l.Next()
-	l.cursor = cursor
-	l.line = line
-	l.column = column
+	l.cursor, l.line, l.column = cursor, line, column
 	return token
 }
 
@@ -235,8 +186,16 @@ func (l *Lexer) GetNextPtr() *Token {
 	return &token
 }
 
-func (l *Lexer) IsEnd() bool {
-	return l.cursor >= len(l.data)
+func (l *Lexer) HasNext() bool {
+	return l.cursor < len(l.data)
+}
+
+func (l *Lexer) GetNext(token rune) bool {
+	if l.HasNext() && l.data[l.cursor] == token {
+		l.NextCursor()
+		return true
+	}
+	return false
 }
 
 func (l *Lexer) readNumber(number string) (string, bool) {
@@ -289,4 +248,12 @@ func (l *Lexer) readString() string {
 		l.NextCursor()
 	}
 	return str
+}
+
+func (l *Lexer) ReadAll() []Token {
+	var tokens []Token
+	for l.HasNext() {
+		tokens = append(tokens, l.Next())
+	}
+	return tokens
 }

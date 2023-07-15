@@ -9,6 +9,7 @@ type Token struct {
 
 const (
 	EOF TokenType = iota
+	Sep
 	Integer
 	Float
 	String
@@ -34,18 +35,17 @@ const (
 	Subtraction
 	Multiplication
 	Division
-	Modulo
-	Exponent
-	LeftParenthesis
-	RightParenthesis
-	LeftBracket
-	RightBracket
-	LeftBrace
-	RightBrace
-	Comma
-	Period
-	Colon
-	Semicolon
+	Modulo           // %
+	Exponent         // ^
+	LeftParenthesis  // (
+	RightParenthesis // )
+	LeftBracket      // [
+	RightBracket     // ]
+	LeftBrace        // {
+	RightBrace       // }
+	Comma            // ,
+	Period           // .
+	Colon            // :
 	Equals
 	PlusEquals
 	MinusEquals
@@ -63,3 +63,23 @@ const (
 	GreaterThanOrEqual
 	LessThanOrEqual
 )
+
+var KeywordMap = map[string]TokenType{
+	"true":     True,
+	"false":    False,
+	"null":     Null,
+	"fn":       Function,
+	"return":   Return,
+	"if":       If,
+	"elif":     Elif,
+	"else":     Else,
+	"for":      For,
+	"in":       In,
+	"while":    While,
+	"break":    Break,
+	"continue": Continue,
+	"import":   Import,
+	"use":      Use,
+	"try":      Try,
+	"catch":    Catch,
+}

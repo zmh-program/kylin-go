@@ -3,7 +3,8 @@ package source
 var ChineseKeyword = map[string]string{
 	"如果": "if",
 	"否则": "else",
-	"循环": "for",
+	"遍历": "for",
+	"在":  "in",
 	"当":  "while",
 	"中断": "break",
 	"继续": "continue",

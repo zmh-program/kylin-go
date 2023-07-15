@@ -1,6 +1,7 @@
 package interpret
 
 import (
+	"kylin/i18n"
 	"kylin/utils"
 )
 
@@ -8,13 +9,14 @@ const EnableDecimal = false
 
 type Lexer struct {
 	data   []rune
+	i18n   *i18n.Manager
 	cursor int
 	line   int
 	column int
 }
 
-func NewLexer(data string) *Lexer {
-	return &Lexer{data: []rune(data), cursor: 0, line: 1, column: 0}
+func NewLexer(data string, i18n *i18n.Manager) *Lexer {
+	return &Lexer{data: []rune(data), cursor: 0, line: 1, column: 0, i18n: i18n}
 }
 
 func (l *Lexer) NextCursor() {
@@ -149,6 +151,7 @@ func (l *Lexer) Next() Token {
 		}
 		if utils.IsLetter(value) {
 			identifier := l.readIdentifier(string(value))
+			identifier = l.i18n.GetKeyword(identifier)
 			switch identifier {
 			case "true":
 				return Token{Type: True, Value: "true"}

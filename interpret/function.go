@@ -16,7 +16,7 @@ type KyFunction struct {
 func (k *KyFunction) CallWrapper(scope *include.Scope, i18n *i18n.Manager) interface{} {
 	return func(args ...interface{}) interface{} {
 		interpreter := &Interpreter{
-			lexer:  NewLexer(k.Body),
+			lexer:  NewLexer(k.Body, i18n),
 			scope:  include.NewScope(scope),
 			module: module.NewManager(),
 			i18n:   i18n,

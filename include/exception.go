@@ -22,7 +22,7 @@ func (e *Exception) Call() interface{} {
 }
 
 func (e *Exception) Repr() string {
-	return fmt.Sprintf("%s(message=\"%s\", type=\"%s\", line=%d, column=%d)", e.Name, e.Message, e.Name, e.Line, e.Column)
+	return fmt.Sprintf("%s(type=\"%s\", message=\"%s\", line=%d, column=%d)", e.Name, e.Name, e.Message, e.Line, e.Column)
 }
 
 func NewException(name string, message string, line int, column int) *Exception {

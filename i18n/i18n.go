@@ -66,7 +66,11 @@ func (m *Manager) GetKeyword(key string) string {
 	if m.Lang == "" {
 		return key
 	}
-	return m.Sources[m.Lang].Keyword[key]
+	if value, ok := m.Sources[m.Lang].Keyword[key]; ok {
+		return value
+	} else {
+		return key
+	}
 }
 
 func (m *Manager) GetBuiltin(key string) string {
@@ -77,6 +81,7 @@ func (m *Manager) GetBuiltin(key string) string {
 }
 
 func (m *Manager) Register(scope *include.Scope, language string) {
+	m.Set(language)
 	scope.Set("i18n", map[string]interface{}{
 		"set": func(lang string) bool {
 			return m.Set(lang)

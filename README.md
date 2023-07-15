@@ -147,6 +147,8 @@ kylin main.ky
 - `true` 真
 - `false` 假
 - `null` 空
+- `try` 异常截获
+- `catch` 异常截获
 - `break` 跳出循环
 - `continue` 跳过本次循环
 - `import` 导入

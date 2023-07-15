@@ -21,7 +21,7 @@ type Interpreter struct {
 func NewInterpreter(path string, parent *include.Scope, i18n *i18n.Manager) *Interpreter {
 	data := utils.ReadKylinFile(path)
 	return &Interpreter{
-		lexer:  NewLexer(data),
+		lexer:  NewLexer(data, i18n),
 		scope:  include.NewScope(parent),
 		module: module.NewManager(),
 		i18n:   i18n,

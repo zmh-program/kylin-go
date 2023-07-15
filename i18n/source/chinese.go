@@ -10,6 +10,8 @@ var ChineseKeyword = map[string]string{
 	"继续": "continue",
 	"返回": "return",
 	"函数": "fn",
+	"尝试": "try",
+	"捕获": "catch",
 	"真":  "true",
 	"假":  "false",
 	"空":  "null",

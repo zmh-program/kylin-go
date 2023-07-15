@@ -29,6 +29,33 @@ fn main() {
 main()
 ```
 
+## 国际化
+```kylin
+use 'chinese'
+
+遍历 变量 在 范围(2) {
+    输出(变量, "hi")
+     尝试 {
+        输出(变量位置, "hi")
+    } 捕获 {
+        输出("报错：", error)
+    }
+}
+
+```
+
+> ```shell
+> 0.000000 hi
+> 报错： ReferenceError(type="ReferenceError", message="Variable 变量
+> 位置 not defined", line=7, column=15)
+> 1.000000 hi
+> 报错： ReferenceError(type="ReferenceError", message="Variable 变量
+> 位置 not defined", line=7, column=15)
+> 2.000000 hi
+> 报错： ReferenceError(type="ReferenceError", message="Variable 变量
+> 位置 not defined", line=7, column=15)
+> ```
+
 ## 语言规范
 #### 1. 赋值计算
 ```kylin

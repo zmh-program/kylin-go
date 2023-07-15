@@ -196,9 +196,11 @@ func (l *Lexer) Next() Token {
 }
 
 func (l *Lexer) Peek() Token {
-	cursor := l.cursor
+	cursor, line, column := l.cursor, l.line, l.column
 	token := l.Next()
 	l.cursor = cursor
+	l.line = line
+	l.column = column
 	return token
 }
 

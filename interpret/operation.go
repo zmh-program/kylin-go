@@ -64,6 +64,7 @@ func (i *Interpreter) ConditionCall() interface{} {
 
 func (i *Interpreter) WhileCall() interface{} {
 	cursor := i.lexer.cursor
+	line := i.lexer.line
 	condition := utils.ToBool(i.ExprNext())
 
 	if condition {
@@ -92,6 +93,7 @@ func (i *Interpreter) WhileCall() interface{} {
 		}
 
 		i.lexer.cursor = cursor
+		i.lexer.line = line
 		i.WhileCall()
 	} else {
 		i.Skip()
@@ -131,6 +133,7 @@ func (i *Interpreter) ForCall() interface{} {
 
 	idx := 0
 	cursor := i.lexer.cursor
+	line := i.lexer.line
 
 	for {
 		i.SetVariable(param, array[idx])
@@ -160,6 +163,7 @@ func (i *Interpreter) ForCall() interface{} {
 		}
 
 		i.lexer.cursor = cursor
+		i.lexer.line = line
 	}
 
 	return nil

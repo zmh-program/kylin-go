@@ -61,6 +61,31 @@ func (p *Parser) ParseCount() ExecSequence {
 	return ExecSequence{Type: CountSequence, Data: count}
 }
 
+func (p *Parser) ParseIdentifier(n Token) (ExecSequence, bool) {
+	if p.Peek().Type == Sep {
+		return ExecSequence{Type: IdentifierSequence, Data: CountStruct{
+			Value: []Token{n},
+		}}, true
+	} else if p.Peek().Type == LeftParenthesis {
+		call := FunctionCallStruct{}
+		call.Name = n.Value
+		p.Skip()
+		for p.HasNext() {
+			if p.Peek().Type == RightParenthesis {
+				p.Skip()
+				break
+			}
+			call.Args = append(call.Args, p.Parse())
+			if p.Peek().Type == Comma {
+				p.Skip()
+			}
+		}
+		lib.Print(call)
+		return ExecSequence{Type: FunctionCallSequence, Data: call}, true
+	}
+	return ExecSequence{}, false
+}
+
 func (p *Parser) ParseAssign() ExecSequence {
 	assign := AssignStruct{
 		Variable: p.Get().Value,
@@ -244,10 +269,8 @@ func (p *Parser) Parse() ExecSequence {
 	n := p.Next()
 	switch n.Type {
 	case Identifier:
-		if p.Peek().Type == Sep {
-			return ExecSequence{Type: IdentifierSequence, Data: CountStruct{
-				Value: []Token{n},
-			}}
+		if res, ok := p.ParseIdentifier(n); ok {
+			return res
 		}
 		return p.ParseAssign()
 	case Function:
@@ -278,6 +301,5 @@ func (p *Parser) ParseAll() []ExecSequence {
 	for _, v := range stack {
 		fmt.Println(v)
 	}
-	fmt.Println(len(stack))
 	return stack
 }

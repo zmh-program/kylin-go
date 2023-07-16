@@ -8,6 +8,7 @@ const (
 	TrySequence
 	AssignSequence
 	FunctionSequence
+	FunctionCallSequence
 	CountSequence
 )
 

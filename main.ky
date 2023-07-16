@@ -1,16 +1,2 @@
-n = 0
-val = 2345
-t = time()
-while n < 10 {
-    n += 1
-    val **= 128
-    val = n * 9999
-    print(val)
-    if val > 0 {
-        print("val > 0")
-    } else {
-        print("val <= 0")
-    }
-}
-
-print(time() - t, "ms")
+n = hi + 123
+print(n + 1)

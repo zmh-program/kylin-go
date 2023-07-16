@@ -13,7 +13,7 @@ type Parser struct {
 
 func NewParser(data string, i18n *i18n.Manager) *Parser {
 	lexer := NewLexer(data, i18n)
-	return &Parser{data: lexer.ReadAll()}
+	return &Parser{data: lexer.ReadAll(), cursor: -1}
 }
 
 func (p *Parser) HasNext() bool {
@@ -232,7 +232,15 @@ func (p *Parser) ParseIf() ExecSequence {
 	return ExecSequence{Type: IfSequence, Data: _if}
 }
 
+func (p *Parser) BreakSep() {
+	for p.HasNext() && p.Peek().Type == Sep {
+		p.Skip()
+	}
+	return
+}
+
 func (p *Parser) Parse() ExecSequence {
+	p.BreakSep()
 	n := p.Next()
 	switch n.Type {
 	case Identifier:
@@ -259,11 +267,17 @@ func (p *Parser) Parse() ExecSequence {
 func (p *Parser) ParseAll() []ExecSequence {
 	stack := make([]ExecSequence, 0)
 	for p.HasNext() {
-		if p.Next().Type == Sep {
+		if p.Peek().Type == Sep {
+			p.Skip()
 			continue
 		}
-		stack = append(stack, p.Parse())
+		if res := p.Parse(); res.Data != nil {
+			stack = append(stack, res)
+		}
 	}
-	fmt.Println(stack)
+	for _, v := range stack {
+		fmt.Println(v)
+	}
+	fmt.Println(len(stack))
 	return stack
 }

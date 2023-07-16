@@ -121,12 +121,9 @@ func (p *Parser) ParseWhile() ExecSequence {
 
 func (p *Parser) ParseFor() ExecSequence {
 	_for := ForStruct{}
-	for p.HasNext() {
-		if p.Peek().Type == LeftBrace {
-			break
-		}
-		_for.Condition = append(_for.Condition, p.Next())
-	}
+	_for.Variable = p.Next().Value
+	p.Assert(In)
+	_for.Array = p.ParseCount()
 	p.Assert(LeftBrace)
 	for p.HasNext() {
 		if p.Peek().Type == RightBrace {
@@ -139,6 +136,100 @@ func (p *Parser) ParseFor() ExecSequence {
 		}
 	}
 	return ExecSequence{Type: ForSequence, Data: _for}
+}
+
+func (p *Parser) ParseTry() ExecSequence {
+	_try := TryStruct{}
+	p.Assert(LeftBrace)
+	for p.HasNext() {
+		if p.Peek().Type == RightBrace {
+			p.Skip()
+			break
+		}
+		_try.Body = append(_try.Body, p.Parse())
+		if p.Peek().Type == Sep {
+			p.Skip()
+		}
+	}
+
+	if p.Peek().Type == Catch {
+		p.Skip()
+		for p.HasNext() {
+			if p.Peek().Type == LeftBrace {
+				break
+			}
+			_try.Catch = append(_try.Catch, p.Parse())
+			if p.Peek().Type == Sep {
+				p.Skip()
+			}
+		}
+	}
+	return ExecSequence{Type: TrySequence, Data: _try}
+}
+
+func (p *Parser) ParseElif() ElifStruct {
+	_elif := ElifStruct{}
+	for p.HasNext() {
+		if p.Peek().Type == LeftBrace {
+			break
+		}
+		_elif.Condition = append(_elif.Condition, p.Next())
+		if p.Peek().Type == Sep {
+			p.Skip()
+		}
+	}
+	p.Assert(LeftBrace)
+	for p.HasNext() {
+		if p.Peek().Type == RightBrace {
+			p.Skip()
+			break
+		}
+		_elif.Body = append(_elif.Body, p.Parse())
+		if p.Peek().Type == Sep {
+			p.Skip()
+		}
+	}
+	return _elif
+}
+
+func (p *Parser) ParseIf() ExecSequence {
+	_if := IfStruct{}
+	for p.HasNext() {
+		if p.Peek().Type == LeftBrace {
+			break
+		}
+		_if.Condition = append(_if.Condition, p.Next())
+	}
+	p.Assert(LeftBrace)
+	for p.HasNext() {
+		if p.Peek().Type == RightBrace {
+			p.Skip()
+			break
+		}
+		_if.Body = append(_if.Body, p.Parse())
+		if p.Peek().Type == Sep {
+			p.Skip()
+		}
+	}
+
+	for p.Peek().Type == Elif {
+		p.Skip()
+		_if.Elif = append(_if.Elif, p.ParseElif())
+	}
+
+	if p.Peek().Type == Else {
+		p.Skip()
+		for p.HasNext() {
+			if p.Peek().Type == LeftBrace {
+				break
+			}
+			_if.Else = append(_if.Else, p.Parse())
+			if p.Peek().Type == Sep {
+				p.Skip()
+			}
+		}
+	}
+	return ExecSequence{Type: IfSequence, Data: _if}
 }
 
 func (p *Parser) Parse() ExecSequence {
@@ -157,6 +248,10 @@ func (p *Parser) Parse() ExecSequence {
 		return p.ParseWhile()
 	case For:
 		return p.ParseFor()
+	case Try:
+		return p.ParseTry()
+	case If:
+		return p.ParseIf()
 	}
 	return ExecSequence{}
 }

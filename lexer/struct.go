@@ -22,17 +22,18 @@ type WhileStruct struct { // while condition {}
 }
 
 type ForStruct struct { // for condition {}
+	Variable string
+	Array    ExecSequence
+	Body     []ExecSequence
+}
+
+type ElifStruct struct { // elif condition {}
 	Condition []Token
 	Body      []ExecSequence
 }
 
-type ElifStruct struct { // elif condition {}
-	Condition string
-	Body      []ExecSequence
-}
-
 type IfStruct struct { // if condition {} <ElifStruct> else {}
-	Condition string
+	Condition []Token
 	Body      []ExecSequence
 	Elif      []ElifStruct
 	Else      []ExecSequence

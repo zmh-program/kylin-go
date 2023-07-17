@@ -8,6 +8,7 @@ import (
 	"kylin/lib"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Parser struct {
@@ -394,7 +395,8 @@ func (p *Parser) Compile() []byte {
 	return CompileStack(p.ParseAll())
 }
 
-func (p *Parser) FSWrite(path string) {
+func (p *Parser) FpWrite(path string) {
+	path = strings.TrimSuffix(path, ".ky") + ".kym"
 	err := os.WriteFile(path, p.Compile(), 0644)
 	if err != nil {
 		panic(err)

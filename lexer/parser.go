@@ -1,8 +1,12 @@
 package lexer
 
 import (
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
 	"kylin/i18n"
 	"kylin/lib"
+	"os"
 	"strconv"
 )
 
@@ -383,9 +387,33 @@ func (p *Parser) ParseAll() []ExecSequence {
 			stack = append(stack, res)
 		}
 	}
-	for _, v := range stack {
-		lib.Print(v)
-		//fmt.Println(v)
-	}
 	return stack
+}
+
+func (p *Parser) Compile() []byte {
+	return CompileStack(p.ParseAll())
+}
+
+func (p *Parser) FSWrite(path string) {
+	err := os.WriteFile(path, p.Compile(), 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func CompileStack(stack []ExecSequence) []byte {
+	text, err := json.Marshal(stack)
+	if err != nil {
+		panic(err)
+	}
+
+	var buf bytes.Buffer
+	writer := gzip.NewWriter(&buf)
+	if _, err := writer.Write(text); err != nil {
+		panic(err)
+	}
+	if err := writer.Close(); err != nil {
+		panic(err)
+	}
+	return buf.Bytes()
 }

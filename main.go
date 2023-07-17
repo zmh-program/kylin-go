@@ -5,6 +5,7 @@ import (
 	"kylin/lexer"
 	"kylin/lib"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -23,5 +24,5 @@ func main() {
 	//runtime.Run()
 
 	parser := lexer.NewParser(lib.ReadKylinFile(file), i18n.NewManager())
-	parser.ParseAll()
+	parser.FSWrite(strings.TrimSuffix(file, ".ky") + ".kym")
 }

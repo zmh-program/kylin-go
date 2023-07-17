@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"kylin/i18n"
 	"kylin/lib"
 	"os"
@@ -44,6 +45,13 @@ func (p *Parser) Peek() Token {
 	return Token{}
 }
 
+func (p *Parser) Prev() Token {
+	if p.cursor > 0 {
+		return p.data[p.cursor-1]
+	}
+	return Token{}
+}
+
 func (p *Parser) Skip() {
 	p.cursor++
 }
@@ -53,8 +61,14 @@ func (p *Parser) SkipN(n int) {
 }
 
 func (p *Parser) Assert(t TokenType) {
-	if p.Next().Type != t {
-		lib.Fatal("Syntax error: ", p.Get().Value, " is not ", t)
+	for p.HasNext() {
+		if p.Get().Type == Sep {
+			p.Skip()
+			continue
+		}
+		if p.Next().Type != t {
+			lib.Fatal(fmt.Sprintf("Syntax error: %s is not \"%s\"", p.Get().Value, TokenMap[t]))
+		}
 	}
 }
 
@@ -142,7 +156,7 @@ func (p *Parser) ParseFunctionCall(n Token) ExecSequence {
 	call.Name = n.Value
 	p.Skip()
 	for p.HasNext() {
-		if p.Get().Type == RightParenthesis {
+		if p.Get().Type == RightParenthesis || p.Prev().Type == RightParenthesis {
 			p.Skip()
 			break
 		}
@@ -378,6 +392,7 @@ func (p *Parser) Parse() ExecSequence {
 }
 
 func (p *Parser) ParseAll() []ExecSequence {
+	fmt.Println(p.data)
 	stack := make([]ExecSequence, 0)
 	for p.HasNext() {
 		if p.Peek().Type == Sep {
@@ -385,6 +400,7 @@ func (p *Parser) ParseAll() []ExecSequence {
 			continue
 		}
 		if res := p.Parse(); res.Data != nil {
+			fmt.Println("stack:", res)
 			stack = append(stack, res)
 		}
 	}

@@ -18,7 +18,7 @@ func ParseCommand(data []string) []string {
 func ExecCommand() {
 	command := ParseCommand(os.Args)
 	if len(command) == 0 {
-		return
+		command = []string{"main.ky"}
 	}
 	switch command[0] {
 	default:

@@ -1,2 +1,5 @@
 n = hi + 123
-print(n + 1 + print(print) + 1)
+print(n + 1 + print(print) + 1) + 2
+while true {
+    print(1)
+}

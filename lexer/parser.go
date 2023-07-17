@@ -1,9 +1,9 @@
 package lexer
 
 import (
-	"fmt"
 	"kylin/i18n"
 	"kylin/lib"
+	"strconv"
 )
 
 type Parser struct {
@@ -13,7 +13,7 @@ type Parser struct {
 
 func NewParser(data string, i18n *i18n.Manager) *Parser {
 	lexer := NewLexer(data, i18n)
-	return &Parser{data: lexer.ReadAll(), cursor: -1}
+	return &Parser{data: lexer.ReadAll(), cursor: 0}
 }
 
 func (p *Parser) HasNext() bool {
@@ -43,56 +43,130 @@ func (p *Parser) Skip() {
 	p.cursor++
 }
 
+func (p *Parser) SkipN(n int) {
+	p.cursor += n
+}
+
 func (p *Parser) Assert(t TokenType) {
 	if p.Next().Type != t {
 		lib.Fatal("Syntax error: ", p.Get().Value, " is not ", t)
 	}
 }
 
-func (p *Parser) ParseCount() ExecSequence {
-	count := CountStruct{}
+func (p *Parser) ExprArray() ArrayType {
+	array := make([]Value, 0)
 	for p.HasNext() {
-		if p.Peek().Type == Sep {
+		p.Skip()
+		if p.Get().Type == RightBracket {
 			p.Skip()
 			break
 		}
-		count.Value = append(count.Value, p.Next())
+		array = append(array, p.Expr())
+		if p.Get().Type == Comma {
+			p.Skip()
+		}
+	}
+	return array
+}
+
+func (p *Parser) ExprMap() MapType {
+	m := make(MapType)
+	for p.HasNext() {
+		p.Skip()
+		if p.Get().Type == RightBrace {
+			p.Skip()
+			break
+		}
+		key := p.Get()
+		p.Assert(Colon)
+		p.Skip()
+		value := p.Expr()
+		m[key.Value] = value
+		if p.Get().Type == Comma {
+			p.Skip()
+		}
+	}
+	return m
+}
+
+func (p *Parser) Expr() Value {
+	token := p.Get()
+	switch token.Type {
+	case Integer:
+		value, _ := strconv.Atoi(token.Value)
+		return Value{Type: Integer, Value: value}
+	case Float:
+		value, _ := strconv.ParseFloat(token.Value, 64)
+		return Value{Type: Float, Value: value}
+	case String:
+		return Value{Type: String, Value: token.Value}
+	case Identifier:
+		if p.Peek().Type == LeftParenthesis {
+			return Value{Type: Function, Value: p.ParseFunctionCall(token).Data}
+		}
+		return Value{Type: Identifier, Value: token.Value}
+	case LeftBracket:
+		return Value{Type: Array, Value: p.ExprArray()}
+	case LeftBrace:
+		return Value{Type: Map, Value: p.ExprMap()}
+	case True:
+		return Value{Type: True, Value: true}
+	case False:
+		return Value{Type: False, Value: false}
+	case Null:
+		return Value{Type: Null, Value: nil}
+	}
+	return Value{Type: token.Type, Value: token.Value}
+}
+
+func (p *Parser) ParseCount() ExecSequence {
+	count := CountStruct{}
+	for p.HasNext() {
+		p.Skip()
+		if lib.InArray(p.Get().Type, []TokenType{Sep, RightParenthesis, Comma, RightBracket, RightBrace}) {
+			p.Skip()
+			break
+		}
+		count.Value = append(count.Value, p.Expr())
 	}
 	return ExecSequence{Type: CountSequence, Data: count}
 }
 
-func (p *Parser) ParseIdentifier(n Token) (ExecSequence, bool) {
-	if p.Peek().Type == Sep {
-		return ExecSequence{Type: IdentifierSequence, Data: CountStruct{
-			Value: []Token{n},
-		}}, true
-	} else if p.Peek().Type == LeftParenthesis {
-		call := FunctionCallStruct{}
-		call.Name = n.Value
-		p.Skip()
-		for p.HasNext() {
-			if p.Peek().Type == RightParenthesis {
-				p.Skip()
-				break
-			}
-			call.Args = append(call.Args, p.Parse())
-			if p.Peek().Type == Comma {
-				p.Skip()
-			}
+func (p *Parser) ParseFunctionCall(n Token) ExecSequence {
+	call := FunctionCallStruct{}
+	call.Name = n.Value
+	p.Skip()
+	for p.HasNext() {
+		if p.Get().Type == RightParenthesis {
+			p.Skip()
+			break
 		}
-		lib.Print(call)
-		return ExecSequence{Type: FunctionCallSequence, Data: call}, true
+		call.Args = append(call.Args, p.ParseCount())
+		if p.Peek().Type == EOF {
+			return ExecSequence{Type: FunctionCallSequence, Data: call}
+		}
+		if p.Get().Type == Comma {
+			p.Skip()
+		}
 	}
-	return ExecSequence{}, false
+	return ExecSequence{Type: FunctionCallSequence, Data: call}
 }
 
-func (p *Parser) ParseAssign() ExecSequence {
-	assign := AssignStruct{
-		Variable: p.Get().Value,
-		Type:     p.Next().Type,
-		Value:    p.ParseCount(),
+func (p *Parser) ParseIdentifier(n Token) ExecSequence {
+	if p.Peek().Type == LeftParenthesis {
+		return p.ParseFunctionCall(n)
+	} else if lib.InArray(p.Peek().Type, AssignType) {
+		p.Skip()
+		assign := AssignStruct{
+			Variable: n.Value,
+			Type:     p.Get().Type,
+			Value:    p.ParseCount(),
+		}
+		return ExecSequence{Type: AssignSequence, Data: assign}
 	}
-	return ExecSequence{Type: AssignSequence, Data: assign}
+	return ExecSequence{Type: IdentifierSequence, Data: CountStruct{
+		Value: []Value{p.Expr()},
+	}}
 }
 
 func (p *Parser) ParseFunction() ExecSequence {
@@ -258,21 +332,32 @@ func (p *Parser) ParseIf() ExecSequence {
 }
 
 func (p *Parser) BreakSep() {
-	for p.HasNext() && p.Peek().Type == Sep {
+	for p.HasNext() && p.Get().Type == Sep {
 		p.Skip()
 	}
 	return
 }
 
+func (p *Parser) GetBufferStack() []Token {
+	buffer := []Token{p.Get()}
+	cursor := p.cursor
+	for p.HasNext() {
+		if p.Peek().Type == Sep || p.Peek().Type == EOF {
+			break
+		}
+		p.Skip()
+		buffer = append(buffer, p.Peek())
+	}
+	p.cursor = cursor
+	return buffer
+}
+
 func (p *Parser) Parse() ExecSequence {
 	p.BreakSep()
-	n := p.Next()
+	n := p.Get()
 	switch n.Type {
 	case Identifier:
-		if res, ok := p.ParseIdentifier(n); ok {
-			return res
-		}
-		return p.ParseAssign()
+		return p.ParseIdentifier(n)
 	case Function:
 		return p.ParseFunction()
 	case While:
@@ -284,7 +369,7 @@ func (p *Parser) Parse() ExecSequence {
 	case If:
 		return p.ParseIf()
 	}
-	return ExecSequence{}
+	return p.ParseCount()
 }
 
 func (p *Parser) ParseAll() []ExecSequence {
@@ -299,7 +384,8 @@ func (p *Parser) ParseAll() []ExecSequence {
 		}
 	}
 	for _, v := range stack {
-		fmt.Println(v)
+		lib.Print(v)
+		//fmt.Println(v)
 	}
 	return stack
 }

@@ -63,5 +63,5 @@ type FunctionCallStruct struct { // f(args)
 }
 
 type CountStruct struct { // variable + variable
-	Value []Token
+	Value []Value
 }

@@ -17,6 +17,8 @@ const (
 	False
 	Null
 	Identifier
+	Array
+	Map
 	Function
 	Return
 	If
@@ -82,4 +84,14 @@ var KeywordMap = map[string]TokenType{
 	"use":      Use,
 	"try":      Try,
 	"catch":    Catch,
+}
+
+var AssignType = []TokenType{
+	Equals,
+	PlusEquals,
+	MinusEquals,
+	TimesEquals,
+	DividedEquals,
+	ModuloEquals,
+	ExponentEquals,
 }
